@@ -1,19 +1,20 @@
+import argparse
+import sys
+import pickle
+import os
 import csv
 import cv2
-import pickle
 import numpy as np
 from random import randint
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 import matplotlib.mlab as mlab
-import summarize_training_results as str
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
 from LeNet import LeNet
 
 
 # general setup
-CFG_VISUALIZATION_ENABLED = False    # Deactivate all visualisations for training on AWS instance.
 CFG_DATA_IMAGE_PATH = './data/IMG/'  # Path to image data
 
 # hyperparameters
@@ -29,7 +30,6 @@ def show_configuration():
 
     print(" Configuration")
     print("----------------------------------------------------------")
-    print(" Visualization enabled:  {:s}".format('True' if CFG_VISUALIZATION_ENABLED else 'False'))
     print(" Image data path:        {:s}".format(CFG_DATA_IMAGE_PATH))
     print("")
     print(" Data pre-processing")
@@ -197,7 +197,23 @@ def visualize_data_set(samples):
     plt.show()
 
 
-def main():
+def plot_training_statistics(history):
+    """ Plots the fit history statistics like training and validation loss. 
+    
+    history -- History of model training ['loss', 'val_loss'].
+    """
+    plt.plot(history['loss'], 'x-')
+    plt.plot(history['val_loss'])
+    plt.title('model mean squared error loss')
+    plt.ylabel('mean squared error loss')
+    plt.xlabel('epoch')
+    plt.legend(['training set', 'validation set'], loc='upper right')
+    plt.grid()
+    print('Close the figures to continue...')
+    plt.show()
+
+
+def train_model():
     """ Main routing to initialize and train the network. """
 
     show_configuration()
@@ -206,10 +222,6 @@ def main():
     print('Preparing training and validation datasets...', end='', flush=True)
     train_samples, validation_samples = prepare_datasets('./data/driving_log.csv', VALIDATION_SET_SIZE)
     print('done')
-
-    # visualize data sets
-    if CFG_VISUALIZATION_ENABLED:
-        visualize_data_set(train_samples)
 
     # setup LeNet-5 model
     le_net = LeNet(depth=3, height=160, width=320, regression=True, nb_classes=1, crop_top=CROP_IMAGE_TOP,
@@ -234,25 +246,65 @@ def main():
     model.save('model.h5')
     print('Model saved')
 
-    # show training statistics
-    if CFG_VISUALIZATION_ENABLED:
-        str.plot_training_statistics(history_object.history)
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Model Training and Evaluation')
+
     parser.add_argument(
-        'model',
-        type=str,
-        help='Path to model h5 file. Model should be on the same path.'
+        '-t', '--train',
+        help='Trains the model.',
+        dest='train',
+        action='store_true',
     )
+
     parser.add_argument(
-        'image_folder',
-        type=str,
-        nargs='?',
-        default='',
-        help='Path to image folder. This is where the images from the run will be saved.'
+        '-sc', '--show-configuration',
+        help='Shows the model configuration.',
+        dest='show_configuration',
+        action='store_true',
     )
+
+    parser.add_argument(
+        '-vds', '--visualize-datasets',
+        help='Visualizes random training and validation sample.',
+        dest='visualize_datasets',
+        action='store_true',
+    )
+
+    parser.add_argument(
+        '-th', '--show_training_history',
+        help='Plots the training history (train loss and validation loss).',
+        dest='history_filename',
+        metavar="FILE",
+    )
+
     args = parser.parse_args()
 
-main()
+    if len(sys.argv) == 1:
+        # no arguments found
+        parser.print_usage()
+        parser.exit(1)
+
+    if args.train:
+        # train the model
+        train_model()
+    elif args.show_configuration:
+        # show actual configuration
+        show_configuration()
+    elif args.visualize_datasets:
+        # Prepare data sets and show random training and validation sample
+        print('Preparing training and validation datasets...', end='', flush=True)
+        train_samples, validation_samples = prepare_datasets('./data/driving_log.csv', VALIDATION_SET_SIZE)
+        print('done')
+        print('Show random training sample...')
+        visualize_data_set(train_samples)
+        print('Show random validation sample...')
+        visualize_data_set(validation_samples)
+    elif args.history_filename:
+        # unpickle history object and plot training and validation loss
+        if os.path.isfile(args.history_filename):
+            with open(args.history_filename, 'rb') as file:
+                history = pickle.load(file)
+                plot_training_statistics(history)
+        else:
+            print('History object file \"{:s}\" not found.'.format(args.history_filename))
