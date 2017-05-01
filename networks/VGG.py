@@ -104,7 +104,7 @@ class VGG(BaseNetwork):
         self.model.add(Convolution2D(512, 3, 3, activation='relu'))
         self.model.add(MaxPooling2D((2, 2), strides=(2, 2)))
 
-        # FC --> DROPOUT --> DC --> DROPOUT
+        # FC --> DROPOUT --> FC --> DROPOUT
         self.model.add(Flatten())
         self.model.add(Dense(4096, activation='relu'))
         self.model.add(Dropout(0.5))
