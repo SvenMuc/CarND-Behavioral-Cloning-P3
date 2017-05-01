@@ -10,6 +10,7 @@ import os
 from scipy.stats import norm
 from sklearn.model_selection import train_test_split
 from networks.LeNet import LeNet
+from networks.NvidiaCNN import NvidiaCNN
 from networks.VGG import VGG
 
 
@@ -18,8 +19,8 @@ CFG_DATA_IMAGE_PATH = './data/IMG/'  # Path to image data
 
 # hyperparameters
 VALIDATION_SET_SIZE = 0.2   # proportion of full dataset used for the test set
-NB_EPOCHS = 10              # number of training epochs
-BATCH_SIZE = 128            # Training batch size (number of images per batch)
+NB_EPOCHS = 10              # default number of training epochs
+BATCH_SIZE = 128            # default training batch size (number of images per batch)
 CROP_IMAGE_TOP = 60         # number of pixels the image shall be cropped at top row
 CROP_IMAGE_BOTTOM = 20      # number of pixels the image shall be cropped at bottom row
 
@@ -180,10 +181,11 @@ def train_model(model):
     
     :param model: Supported models are
                   - LeNet5
+                  - NvidiaCNN
                   - VGG16
     """
 
-    supported_models = ['LeNet5', 'VGG16']
+    supported_models = ['LeNet5', 'NvidiaCNN', 'VGG16']
 
     # check for valid model
     matching = [s for s in supported_models if model in s]
@@ -200,18 +202,24 @@ def train_model(model):
     print('Number of training samples:   {:5d}'.format(len(train_samples)))
     print('Number of validation samples: {:5d}'.format(len(validation_samples)))
 
+    global BATCH_SIZE
+    global NB_EPOCHS
+
     if model == 'LeNet5':
         # setup LeNet-5 model architecture
         network = LeNet(input_depth=3, input_height=160, input_width=320, regression=True, nb_classes=1,
                         crop_top=CROP_IMAGE_TOP, crop_bottom=CROP_IMAGE_BOTTOM)
+    elif model == 'NvidiaCNN':
+        # setup NVIDIA CNN model architecture
+        network = NvidiaCNN(input_depth=3, input_height=160, input_width=320, regression=True, nb_classes=1,
+                            crop_top=CROP_IMAGE_TOP, crop_bottom=CROP_IMAGE_BOTTOM)
+        NB_EPOCHS = 7
     elif model == 'VGG16':
         # setup VGG-16 model architecture
         network = VGG(input_depth=3, input_height=160, input_width=320, regression=True, nb_classes=1,
                       crop_top=CROP_IMAGE_TOP, crop_bottom=CROP_IMAGE_BOTTOM)
 
         # reduced batch size due to memory limitation on AWS and optimized number of epochs
-        global BATCH_SIZE
-        global NB_EPOCHS
         BATCH_SIZE = 16
         NB_EPOCHS = 4
     else:
@@ -236,7 +244,7 @@ if __name__ == "__main__":
 
     parser.add_argument(
         '-t', '--train',
-        help='Trains the model. Supported MODELS=\'LeNet5\', \'VGG16\'.',
+        help='Trains the model. Supported MODELS=\'LeNet5\', \'NvidiaCNN\', \'VGG16\'.',
         dest='train_model',
         metavar='MODEL'
     )
