@@ -1,18 +1,15 @@
 import argparse
-import sys
-import pickle
-import os
 import csv
 import cv2
-import numpy as np
+import pickle
+import sys
 from random import randint
-import matplotlib.pyplot as plt
-from scipy.stats import norm
 import matplotlib.mlab as mlab
+import matplotlib.pyplot as plt
+import os
+from scipy.stats import norm
 from sklearn.model_selection import train_test_split
-from sklearn.utils import shuffle
-from LeNet import LeNet
-
+from networks.LeNet import LeNet
 
 # general setup
 CFG_DATA_IMAGE_PATH = './data/IMG/'  # Path to image data
@@ -20,7 +17,7 @@ CFG_DATA_IMAGE_PATH = './data/IMG/'  # Path to image data
 # hyperparameters
 VALIDATION_SET_SIZE = 0.2   # proportion of full dataset used for the test set
 NB_EPOCHS = 10              # number of training epochs
-BATCH_SIZE = 256            # Training batch size (number of images per batch)
+BATCH_SIZE = 128            # Training batch size (number of images per batch)
 CROP_IMAGE_TOP = 60         # number of pixels the image shall be cropped at top row
 CROP_IMAGE_BOTTOM = 20      # number of pixels the image shall be cropped at bottom row
 
@@ -48,13 +45,10 @@ def show_configuration():
 def prepare_datasets(csv_filename, validation_set_proportion):
     """ Prepares the training and validation datasets (images and measurements) from driving log cvs file.
     
-    The function does not load any image into memory. It just reads the locations from the cvs files and split the 
-    sets into training and validation datasets.
+    :param csv_filename:              Path and filename of CVS file.
+    :param validation_set_proportion: Proportion of the full dataset used for the validation set.
     
-    csv_filename        -- Path and filename of CVS file.
-    validation_set_size -- Proportion of the full dataset used for the validation set.
-    
-    Returns the train_samples and validation_samples dataset.
+    :return: Returns the train_samples and validation_samples dataset.
     """
 
     # open and read content of csv file
@@ -73,47 +67,13 @@ def prepare_datasets(csv_filename, validation_set_proportion):
     return train_samples, validation_samples
 
 
-def generator(samples, batch_size=128):
-    """ Generator
-     
-    samples    -- Samples which shall be loaded into memory. 
-    batch_size -- Batch size for actual run.
-    
-    Returns x_train and y_train.
-    """
-
-    nb_samples = len(samples)
-
-    while 1:  # loop forever so the generator never terminates
-        shuffle(samples)
-
-        for offset in range(0, nb_samples, batch_size):
-            batch_samples = samples[offset:offset + batch_size]
-
-            images = []
-            angles = []
-
-            for batch_sample in batch_samples:
-                filename = batch_sample[0].split('/')[-1]
-                current_path = CFG_DATA_IMAGE_PATH + filename
-                center_image = cv2.imread(current_path)
-                center_angle = float(batch_sample[3])
-                images.append(center_image)
-                angles.append(center_angle)
-
-            # convert to numpy arrays
-            x_train = np.array(images)
-            y_train = np.array(angles)
-            yield shuffle(x_train, y_train)
-
-
 def visualize_data_set(samples):
     """ Visualize the data set (random image) and ground truth data.
-     
-    samples -- Samples in format [center, left, right, steering, throttle, brake, speed].
     
     REMARK:
     In order to enable plotting in PyCharm add environment variable 'DISPLAY = True'.
+    
+    :param samples: Samples in format [center, left, right, steering, throttle, brake, speed].
     """
 
     print("Plotting diagrams...", end='', flush=True)
@@ -198,9 +158,9 @@ def visualize_data_set(samples):
 
 
 def plot_training_statistics(history):
-    """ Plots the fit history statistics like training and validation loss. 
+    """ Plots the fit history statistics like training and validation loss.
     
-    history -- History of model training ['loss', 'val_loss'].
+    :param history: History of model training ['loss', 'val_loss'].
     """
     plt.plot(history['loss'], 'x-')
     plt.plot(history['val_loss'])
@@ -213,38 +173,50 @@ def plot_training_statistics(history):
     plt.show()
 
 
-def train_model():
-    """ Main routing to initialize and train the network. """
+def train_model(model):
+    """ Initializes and trains the selected network.
+    
+    :param model: Supported models are
+                  - LeNet5
+                  - VGG16
+    """
+
+    supported_models = ['LeNet5', 'VGG16']
+
+    # check for valid model
+    matching = [s for s in supported_models if model in s]
+
+    if len(matching) == 0:
+        print('Not support model. Check help for supported models.')
+        exit(-1)
 
     show_configuration()
 
-    # Prepare data sets
+    # prepare data sets
     print('Preparing training and validation datasets...', end='', flush=True)
     train_samples, validation_samples = prepare_datasets('./data/driving_log.csv', VALIDATION_SET_SIZE)
     print('done')
 
-    # setup LeNet-5 model
-    le_net = LeNet(depth=3, height=160, width=320, regression=True, nb_classes=1, crop_top=CROP_IMAGE_TOP,
-                   crop_bottom=CROP_IMAGE_BOTTOM)
-    model = le_net.model
+    print('Number of training samples:   {:5d}'.format(len(train_samples)))
+    print('Number of validation samples: {:5d}'.format(len(validation_samples)))
+
+    if model == 'LeNet5':
+        # setup LeNet-5 model architecture
+        network = LeNet(input_depth=3, input_height=160, input_width=320, regression=True, nb_classes=1,
+                        crop_top=CROP_IMAGE_TOP, crop_bottom=CROP_IMAGE_BOTTOM)
+    else:
+        print('Not support model. Check help for supported models.')
+        exit(-1)
 
     # setup training and validation generators
-    train_generator = generator(train_samples, batch_size=BATCH_SIZE)
-    validation_generator = generator(validation_samples, batch_size=BATCH_SIZE)
+    network.setup_training_validation_generators(train_samples, validation_samples, CFG_DATA_IMAGE_PATH, BATCH_SIZE)
 
     # train the model
-    model.compile(optimizer='adam', loss='mse')
-    history_object = model.fit_generator(train_generator, samples_per_epoch=len(train_samples),
-                                         validation_data=validation_generator, nb_val_samples=len(validation_samples),
-                                         nb_epoch=NB_EPOCHS, verbose=1)
+    network.train(NB_EPOCHS)
 
     # save the training results
-    file = open('history.obj', 'wb')
-    pickle.dump(history_object.history, file)
-    file.close()
-
-    model.save('model.h5')
-    print('Model saved')
+    network.save_history(model + '_history.obj')
+    network.safe_model(model + '_model.h5')
 
 
 if __name__ == "__main__":
@@ -252,30 +224,30 @@ if __name__ == "__main__":
 
     parser.add_argument(
         '-t', '--train',
-        help='Trains the model.',
-        dest='train',
-        action='store_true',
+        help='Trains the model. Supported MODELS=\'LeNet5\', \'VGG16\'.',
+        dest='train_model',
+        metavar='MODEL'
     )
 
     parser.add_argument(
         '-sc', '--show-configuration',
         help='Shows the model configuration.',
         dest='show_configuration',
-        action='store_true',
+        action='store_true'
     )
 
     parser.add_argument(
         '-vds', '--visualize-datasets',
         help='Visualizes random training and validation sample.',
         dest='visualize_datasets',
-        action='store_true',
+        action='store_true'
     )
 
     parser.add_argument(
         '-th', '--show_training_history',
         help='Plots the training history (train loss and validation loss).',
         dest='history_filename',
-        metavar="FILE",
+        metavar="FILE"
     )
 
     args = parser.parse_args()
@@ -285,9 +257,9 @@ if __name__ == "__main__":
         parser.print_usage()
         parser.exit(1)
 
-    if args.train:
+    if args.train_model:
         # train the model
-        train_model()
+        train_model(args.train_model)
     elif args.show_configuration:
         # show actual configuration
         show_configuration()
