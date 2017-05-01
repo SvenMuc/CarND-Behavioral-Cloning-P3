@@ -10,6 +10,8 @@ import os
 from scipy.stats import norm
 from sklearn.model_selection import train_test_split
 from networks.LeNet import LeNet
+from networks.VGG import VGG
+
 
 # general setup
 CFG_DATA_IMAGE_PATH = './data/IMG/'  # Path to image data
@@ -25,16 +27,16 @@ CROP_IMAGE_BOTTOM = 20      # number of pixels the image shall be cropped at bot
 def show_configuration():
     """ Shows a summary of the actual configuration. """
 
-    print(" Configuration")
+    print("General Configuration")
     print("----------------------------------------------------------")
     print(" Image data path:        {:s}".format(CFG_DATA_IMAGE_PATH))
     print("")
-    print(" Data pre-processing")
+    print("Data pre-processing")
     print("----------------------------------------------------------")
     print(" Crop image at top:      {:d} pixels".format(CROP_IMAGE_TOP))
     print(" Crop image at bottom:   {:d} pixels".format(CROP_IMAGE_BOTTOM))
     print("")
-    print(" Hyperparameters")
+    print("Hyperparameters")
     print("----------------------------------------------------------")
     print(" Validation set size:    {:.2f}".format(VALIDATION_SET_SIZE))
     print(" Batch size:             {:d}".format(BATCH_SIZE))
@@ -190,8 +192,6 @@ def train_model(model):
         print('Not support model. Check help for supported models.')
         exit(-1)
 
-    show_configuration()
-
     # prepare data sets
     print('Preparing training and validation datasets...', end='', flush=True)
     train_samples, validation_samples = prepare_datasets('./data/driving_log.csv', VALIDATION_SET_SIZE)
@@ -204,9 +204,21 @@ def train_model(model):
         # setup LeNet-5 model architecture
         network = LeNet(input_depth=3, input_height=160, input_width=320, regression=True, nb_classes=1,
                         crop_top=CROP_IMAGE_TOP, crop_bottom=CROP_IMAGE_BOTTOM)
+    elif model == 'VGG16':
+        # setup VGG-16 model architecture
+        network = VGG(input_depth=3, input_height=160, input_width=320, regression=True, nb_classes=1,
+                      crop_top=CROP_IMAGE_TOP, crop_bottom=CROP_IMAGE_BOTTOM)
+
+        # reduced batch size due to memory limitation on AWS and optimized number of epochs
+        global BATCH_SIZE
+        global NB_EPOCHS
+        BATCH_SIZE = 16
+        NB_EPOCHS = 4
     else:
         print('Not support model. Check help for supported models.')
         exit(-1)
+
+    show_configuration()
 
     # setup training and validation generators
     network.setup_training_validation_generators(train_samples, validation_samples, CFG_DATA_IMAGE_PATH, BATCH_SIZE)
