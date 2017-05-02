@@ -22,7 +22,7 @@ CROP_IMAGE_TOP = 60         # number of pixels the image shall be cropped at top
 CROP_IMAGE_BOTTOM = 20      # number of pixels the image shall be cropped at bottom row
 
 # augmentation
-STEERING_ANGLE_CORRECTION = 3.7 # Steering angle correction for left and right images in degree
+STEERING_ANGLE_CORRECTION = 2.5 # Steering angle correction for left and right images in degree
 
 
 def show_configuration(dataset_csv_filename):
