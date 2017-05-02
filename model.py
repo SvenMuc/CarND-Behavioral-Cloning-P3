@@ -1,21 +1,18 @@
 import argparse
 import csv
-import cv2
 import pickle
 import sys
-from random import randint
-import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 import os
-from scipy.stats import norm
 from sklearn.model_selection import train_test_split
+from data_augmentation import visualize_data_set
 from networks.LeNet import LeNet
 from networks.NvidiaCNN import NvidiaCNN
 from networks.VGG import VGG
 
 
 # general setup
-CFG_DATA_IMAGE_PATH = './data/IMG/'  # Path to image data
+CFG_DATASET_PATH = './data' # Path to dataset
 
 # hyperparameters
 VALIDATION_SET_SIZE = 0.2   # proportion of full dataset used for the test set
@@ -30,7 +27,7 @@ def show_configuration():
 
     print("General Configuration")
     print("----------------------------------------------------------")
-    print(" Image data path:        {:s}".format(CFG_DATA_IMAGE_PATH))
+    print(" Path to dataset:        {:s}".format(CFG_DATASET_PATH))
     print("")
     print("Data pre-processing")
     print("----------------------------------------------------------")
@@ -45,11 +42,12 @@ def show_configuration():
     print("")
 
 
-def prepare_datasets(csv_filename, validation_set_proportion):
+def prepare_datasets(csv_filename, validation_set_proportion=0.0):
     """ Prepares the training and validation datasets (images and measurements) from driving log cvs file.
     
     :param csv_filename:              Path and filename of CVS file.
-    :param validation_set_proportion: Proportion of the full dataset used for the validation set.
+    :param validation_set_proportion: Proportion of the full dataset used for the validation set. If set to 0.0 only 
+                                      one sample array is returned. Default = 0.0
     
     :return: Returns the train_samples and validation_samples dataset.
     """
@@ -65,99 +63,12 @@ def prepare_datasets(csv_filename, validation_set_proportion):
         for line in reader:
             samples.append(line)
 
-    train_samples, validation_samples = train_test_split(samples, test_size=validation_set_proportion)
+    if validation_set_proportion == 0:
+        return samples
+    else:
+        train_samples, validation_samples = train_test_split(samples, test_size=validation_set_proportion)
 
-    return train_samples, validation_samples
-
-
-def visualize_data_set(samples):
-    """ Visualize the data set (random image) and ground truth data.
-    
-    REMARK:
-    In order to enable plotting in PyCharm add environment variable 'DISPLAY = True'.
-    
-    :param samples: Samples in format [center, left, right, steering, throttle, brake, speed].
-    """
-
-    print("Plotting diagrams...", end='', flush=True)
-
-    #
-    # Plot center, left and right random image
-    #
-    nb_samples = len(samples)
-    idx = randint(0, nb_samples)
-
-    # load random center, left and right image
-    filename = samples[idx][0].split('/')[-1]
-    image_path = CFG_DATA_IMAGE_PATH + filename
-    center_image = cv2.imread(image_path)
-
-    filename = samples[idx][1].split('/')[-1]
-    image_path = CFG_DATA_IMAGE_PATH + filename
-    left_image = cv2.imread(image_path)
-
-    filename = samples[idx][2].split('/')[-1]
-    image_path = CFG_DATA_IMAGE_PATH + filename
-    right_image = cv2.imread(image_path)
-
-    # all images have the same width and height
-    height = center_image.shape[0]
-    width = center_image.shape[1]
-
-    # show random images
-    fig = plt.figure(figsize=(12, 3))
-    ax1 = fig.add_subplot(131)
-    ax2 = fig.add_subplot(132)
-    ax3 = fig.add_subplot(133)
-
-    title = 'image set {:d} (w={:d}, h={:d}) with ROI = [0, {:d}, {:d}, {:d}]'.format(idx, width, height,
-                                                                                      CROP_IMAGE_TOP, width,
-                                                                                      height - CROP_IMAGE_BOTTOM)
-    fig.suptitle(title)
-
-    # prepare images and show ROI
-    left_image = cv2.cvtColor(left_image, cv2.COLOR_RGB2BGR)
-    cv2.rectangle(left_image, (0, CROP_IMAGE_TOP), (width - 1, height - CROP_IMAGE_BOTTOM), (255, 0, 0), 1)
-    ax1.imshow(left_image)
-    ax1.set_title('left image')
-
-    center_image = cv2.cvtColor(center_image, cv2.COLOR_RGB2BGR)
-    cv2.rectangle(center_image, (0, CROP_IMAGE_TOP), (width - 1, height - CROP_IMAGE_BOTTOM), (255, 0, 0), 1)
-    ax2.imshow(center_image)
-    ax2.set_title('center image')
-
-    right_image = cv2.cvtColor(right_image, cv2.COLOR_RGB2BGR)
-    cv2.rectangle(right_image, (0, CROP_IMAGE_TOP), (width - 1, height - CROP_IMAGE_BOTTOM), (255, 0, 0), 1)
-    ax3.imshow(right_image)
-    ax3.set_title('right image')
-
-    plt.subplots_adjust(left=0.04, right=0.98, top=0.75)
-
-    #
-    # plot steering angle histogram
-    #
-    center_angles = []
-
-    for sample in samples:
-        center_angles.append(float(sample[3]))
-
-    fig = plt.figure()
-    n, bins, patches = plt.hist(center_angles, 100, normed=1, facecolor='green', edgecolor='black', alpha=0.75,
-                                histtype='bar', rwidth=0.85)
-    plt.xlabel('center steering angle [degree]')
-    plt.ylabel('frequency')
-    plt.grid(True)
-
-    # add a line showing the expected distribution
-    (mu, sigma) = norm.fit(center_angles)
-    y = mlab.normpdf(bins, mu, sigma)
-    plt.plot(bins, y, 'r--', linewidth=1.5)
-
-    fig.suptitle(r'$\mathrm{Histogram\ of\ center\ steering\ angle}\ (\mu=%.4f,\ \sigma=%.4f)$' % (mu, sigma))
-
-    print('done')
-    print('Close the figures to continue...')
-    plt.show()
+        return train_samples, validation_samples
 
 
 def plot_training_statistics(history):
@@ -176,13 +87,14 @@ def plot_training_statistics(history):
     plt.show()
 
 
-def train_model(model):
+def train_model(model, dataset_csv_filename):
     """ Initializes and trains the selected network.
     
-    :param model: Supported models are
-                  - LeNet5
-                  - NvidiaCNN
-                  - VGG16
+    :param model:           Supported models are
+                             - LeNet5
+                             - NvidiaCNN
+                             - VGG16
+    :dataset_csv_filename:  Path to dataset csv filename.
     """
 
     supported_models = ['LeNet5', 'NvidiaCNN', 'VGG16']
@@ -196,7 +108,7 @@ def train_model(model):
 
     # prepare data sets
     print('Preparing training and validation datasets...', end='', flush=True)
-    train_samples, validation_samples = prepare_datasets('./data/driving_log.csv', VALIDATION_SET_SIZE)
+    train_samples, validation_samples = prepare_datasets(dataset_csv_filename, VALIDATION_SET_SIZE)
     print('done')
 
     print('Number of training samples:   {:5d}'.format(len(train_samples)))
@@ -229,7 +141,7 @@ def train_model(model):
     show_configuration()
 
     # setup training and validation generators
-    network.setup_training_validation_generators(train_samples, validation_samples, CFG_DATA_IMAGE_PATH, BATCH_SIZE)
+    network.setup_training_validation_generators(train_samples, validation_samples, CFG_DATASET_PATH, BATCH_SIZE)
 
     # train the model
     network.train(NB_EPOCHS)
@@ -250,6 +162,13 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
+        '-d', '--dataset',
+        help='Path to dataset CSV file.',
+        dest='dataset_filename',
+        metavar='CSV_FILE'
+    )
+
+    parser.add_argument(
         '-sc', '--show-configuration',
         help='Shows the model configuration.',
         dest='show_configuration',
@@ -257,10 +176,10 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        '-vds', '--visualize-datasets',
-        help='Visualizes random training and validation sample.',
-        dest='visualize_datasets',
-        action='store_true'
+        '-vd', '--visualize-datasets',
+        help='Visualizes random dataset samples.',
+        dest='visualize_dataset_csv',
+        metavar='CSV_FILE'
     )
 
     parser.add_argument(
@@ -279,19 +198,23 @@ if __name__ == "__main__":
 
     if args.train_model:
         # train the model
-        train_model(args.train_model)
+        if args.dataset_filename is None:
+            print('Use -d CSV_FILE parameter to specify the training/validation dataset.')
+        elif os.path.exists(args.dataset_filename):
+            train_model(args.train_model, args.dataset_filename)
+        else:
+            print('Dataset CSV file \'{:s}\' not found.'.format(args.dataset_filename))
     elif args.show_configuration:
         # show actual configuration
         show_configuration()
-    elif args.visualize_datasets:
+    elif args.visualize_dataset_csv:
         # Prepare data sets and show random training and validation sample
         print('Preparing training and validation datasets...', end='', flush=True)
-        train_samples, validation_samples = prepare_datasets('./data/driving_log.csv', VALIDATION_SET_SIZE)
+        samples = prepare_datasets(args.visualize_dataset_csv, 0.0)
         print('done')
-        print('Show random training sample...')
-        visualize_data_set(train_samples)
-        print('Show random validation sample...')
-        visualize_data_set(validation_samples)
+
+        print('Show random dataset samples:')
+        visualize_data_set(samples, title='Dataset', dataset_path=CFG_DATASET_PATH)
     elif args.history_filename:
         # unpickle history object and plot training and validation loss
         if os.path.isfile(args.history_filename):

@@ -48,8 +48,7 @@ class BaseNetwork:
                 angles = []
 
                 for batch_sample in batch_samples:
-                    filename = batch_sample[0].split('/')[-1]
-                    current_path = self.path_to_image_data + filename
+                    current_path = self.path_to_image_data + '/' + batch_sample[0].lstrip()
                     center_image = cv2.imread(current_path)
                     center_angle = float(batch_sample[3])
                     images.append(center_image)
