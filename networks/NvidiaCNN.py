@@ -3,7 +3,6 @@ from keras.models import Sequential
 from keras.layers import Lambda, Cropping2D
 from keras.layers.convolutional import Convolution2D
 from keras.layers.convolutional import MaxPooling2D
-from keras.layers.convolutional import ZeroPadding2D
 from keras.layers.core import Flatten
 from keras.layers.core import Dense
 from keras.layers.core import Dropout
@@ -13,7 +12,7 @@ class NvidiaCNN(BaseNetwork):
     """ NVIDIA CNN network which can be used either for a classification or regression problem."""
 
     def __init__(self, input_width, input_height, input_depth, nb_classes, regression=False,
-                 crop_top=0, crop_bottom=0, weights_path=None):
+                 crop_top=0, crop_bottom=0, steering_angle_correction=0.0, weights_path=None):
         """ Constructs the NVIDIA CNN network architecture.
         
         :param input_width:   Width of the input image.
@@ -25,21 +24,14 @@ class NvidiaCNN(BaseNetwork):
                               is configured with a softmax function.
         :param crop_top:      If >0 the image will be cropped from top row by given number of pixels.
         :param crop_bottom:   If >0 the image will be cropped from bottom by given number of pixels.
+        :param steering_angle_correction: Correction for left and right image steering angles in degree.
         :param weights_path:  Path to trained model parameters. If set, the model will be initialized by these parameters.
         """
 
-        super(NvidiaCNN, self).__init__()
+        super(NvidiaCNN, self).__init__(input_width, input_height, input_depth, nb_classes, regression,
+                                        crop_top, crop_bottom, steering_angle_correction, weights_path)
 
-        self.input_width = input_width
-        self.input_height = input_height
-        self.input_depth = input_depth
-        self.nb_classes = nb_classes
-        self.regression = regression
-        self.crop_top = crop_top
-        self.crop_bottom = crop_bottom
-        self.weights_path = weights_path
-
-        print('VGG-16 Configuration:')
+        print('NVIDIA CNN Configuration:')
         print(' Input Layer: w={:d}, h={:d}, d={:d}'.format(self.input_width, self.input_height, self.input_depth))
         print(' Output Layer: {:d}, {:s}'.format(self.nb_classes, 'regression' if self.regression else 'softmax'))
 

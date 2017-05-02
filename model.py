@@ -21,25 +21,36 @@ BATCH_SIZE = 128            # default training batch size (number of images per 
 CROP_IMAGE_TOP = 60         # number of pixels the image shall be cropped at top row
 CROP_IMAGE_BOTTOM = 20      # number of pixels the image shall be cropped at bottom row
 
+# augmentation
+STEERING_ANGLE_CORRECTION = 3.7 # Steering angle correction for left and right images in degree
 
-def show_configuration():
-    """ Shows a summary of the actual configuration. """
 
-    print("General Configuration")
-    print("----------------------------------------------------------")
-    print(" Path to dataset:        {:s}".format(CFG_DATASET_PATH))
-    print("")
-    print("Data pre-processing")
-    print("----------------------------------------------------------")
-    print(" Crop image at top:      {:d} pixels".format(CROP_IMAGE_TOP))
-    print(" Crop image at bottom:   {:d} pixels".format(CROP_IMAGE_BOTTOM))
-    print("")
-    print("Hyperparameters")
-    print("----------------------------------------------------------")
-    print(" Validation set size:    {:.2f}".format(VALIDATION_SET_SIZE))
-    print(" Batch size:             {:d}".format(BATCH_SIZE))
-    print(" Number of epochs:       {:d}".format(NB_EPOCHS))
-    print("")
+def show_configuration(dataset_csv_filename):
+    """ Shows a summary of the actual configuration.
+    
+    :param dataset_csv_filename: Dataset CSV filename.
+    """
+
+    print('General Configuration')
+    print('----------------------------------------------------------')
+    print(' Path to dataset:           {:s}'.format(CFG_DATASET_PATH))
+    print(' Dataset CSV file:          {:s}'.format(dataset_csv_filename))
+    print('')
+    print('Data pre-processing')
+    print('----------------------------------------------------------')
+    print(' Crop image at top:         {:d} pixels'.format(CROP_IMAGE_TOP))
+    print(' Crop image at bottom:      {:d} pixels'.format(CROP_IMAGE_BOTTOM))
+    print('')
+    print('Hyperparameters')
+    print('----------------------------------------------------------')
+    print(' Validation set size:       {:.2f}'.format(VALIDATION_SET_SIZE))
+    print(' Batch size:                {:d}'.format(BATCH_SIZE))
+    print(' Number of epochs:          {:d}'.format(NB_EPOCHS))
+    print('')
+    print('Augmentation')
+    print('----------------------------------------------------------')
+    print(' Steering angle correction: {:.2f}°'.format(STEERING_ANGLE_CORRECTION))
+    print('')
 
 
 def prepare_datasets(csv_filename, validation_set_proportion=0.0):
@@ -120,16 +131,19 @@ def train_model(model, dataset_csv_filename):
     if model == 'LeNet5':
         # setup LeNet-5 model architecture
         network = LeNet(input_depth=3, input_height=160, input_width=320, regression=True, nb_classes=1,
-                        crop_top=CROP_IMAGE_TOP, crop_bottom=CROP_IMAGE_BOTTOM)
+                        crop_top=CROP_IMAGE_TOP, crop_bottom=CROP_IMAGE_BOTTOM,
+                        steering_angle_correction=STEERING_ANGLE_CORRECTION)
     elif model == 'NvidiaCNN':
         # setup NVIDIA CNN model architecture
         network = NvidiaCNN(input_depth=3, input_height=160, input_width=320, regression=True, nb_classes=1,
-                            crop_top=CROP_IMAGE_TOP, crop_bottom=CROP_IMAGE_BOTTOM)
+                            crop_top=CROP_IMAGE_TOP, crop_bottom=CROP_IMAGE_BOTTOM,
+                            steering_angle_correction=STEERING_ANGLE_CORRECTION)
         NB_EPOCHS = 7
     elif model == 'VGG16':
         # setup VGG-16 model architecture
         network = VGG(input_depth=3, input_height=160, input_width=320, regression=True, nb_classes=1,
-                      crop_top=CROP_IMAGE_TOP, crop_bottom=CROP_IMAGE_BOTTOM)
+                      crop_top=CROP_IMAGE_TOP, crop_bottom=CROP_IMAGE_BOTTOM,
+                      steering_angle_correction=STEERING_ANGLE_CORRECTION)
 
         # reduced batch size due to memory limitation on AWS and optimized number of epochs
         BATCH_SIZE = 16
@@ -138,7 +152,7 @@ def train_model(model, dataset_csv_filename):
         print('Not support model. Check help for supported models.')
         exit(-1)
 
-    show_configuration()
+    show_configuration(dataset_csv_filename)
 
     # setup training and validation generators
     network.setup_training_validation_generators(train_samples, validation_samples, CFG_DATASET_PATH, BATCH_SIZE)
@@ -166,13 +180,6 @@ if __name__ == "__main__":
         help='Path to dataset CSV file.',
         dest='dataset_filename',
         metavar='CSV_FILE'
-    )
-
-    parser.add_argument(
-        '-sc', '--show-configuration',
-        help='Shows the model configuration.',
-        dest='show_configuration',
-        action='store_true'
     )
 
     parser.add_argument(
@@ -204,9 +211,6 @@ if __name__ == "__main__":
             train_model(args.train_model, args.dataset_filename)
         else:
             print('Dataset CSV file \'{:s}\' not found.'.format(args.dataset_filename))
-    elif args.show_configuration:
-        # show actual configuration
-        show_configuration()
     elif args.visualize_dataset_csv:
         # Prepare data sets and show random training and validation sample
         print('Preparing training and validation datasets...', end='', flush=True)

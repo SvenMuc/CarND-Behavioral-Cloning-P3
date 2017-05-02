@@ -1,5 +1,6 @@
 import pickle
 import cv2
+import math
 import numpy as np
 from sklearn.utils import shuffle
 
@@ -7,25 +8,50 @@ from sklearn.utils import shuffle
 class BaseNetwork:
     """ Provides the base routines to train a network architecture and to store the training results. """
 
-    input_width = 0                 # Width of the input layer
-    input_height = 0                # Height of the input layer
-    input_depth = 0                 # Depth of the input layer (e.g. number of channels of an image)
-    nb_classes = 1                  # Number of output classes resp. number of regression values
-    regression = False              # If true, the network is setup as regression problem. Otherwise for classification.
-    crop_top = 0                    # Number of pixels the image is cropped from top row.
-    crop_bottom = 0                 # Number of pixels the image is cropped from bottom row.
-    weights_path = ''               # Path to trained model weights.
-    model = None                    # Keras model
-    batch_size = 128                # Batch size for training
-    train_generator = None          # Generator for training date
-    validation_generator = None     # Generator for validation data
-    train_samples = None            # Training dataset (links to images only!)
-    validation_samples = None       # Validation dataset (links to images only!)
-    path_to_image_data = ''         # Path to image data (replaces the path in the train/valid samples)
-    history_object = None           # History object contains the loss and val_loss data after network training
+    input_width = 0                  # Width of the input layer
+    input_height = 0                 # Height of the input layer
+    input_depth = 0                  # Depth of the input layer (e.g. number of channels of an image)
+    nb_classes = 1                   # Number of output classes resp. number of regression values
+    regression = False               # If true, the network is setup as regression problem. Otherwise for classification.
+    crop_top = 0                     # Number of pixels the image is cropped from top row.
+    crop_bottom = 0                  # Number of pixels the image is cropped from bottom row.
+    steering_angle_correction = 0.0  # Correction of steering angles for left and right images in degrees.
+    weights_path = ''                # Path to trained model weights.
+    model = None                     # Keras model
+    batch_size = 128                 # Batch size for training
+    train_generator = None           # Generator for training date
+    validation_generator = None      # Generator for validation data
+    train_samples = None             # Training dataset (links to images only!)
+    validation_samples = None        # Validation dataset (links to images only!)
+    path_to_image_data = ''          # Path to image data (replaces the path in the train/valid samples)
+    history_object = None            # History object contains the loss and val_loss data after network training
 
-    def __init__(self):
-        """ Initializer for base network. """
+    def __init__(self, input_width, input_height, input_depth, nb_classes, regression=False,
+                 crop_top=0, crop_bottom=0, steering_angle_correction=0.0, weights_path=None):
+        """ Initializes the base network.
+        
+        :param input_width:   Width of the input image.
+        :param input_height:  Height if the input image.
+        :param input_depth:   Depth of the input image (e.g. number of channels).
+        :param nb_classes:    Number of unique classes (class labels) in the dataset. In case of a regression set, the 
+                              number of regression outputs.
+        :param regression:    If true the output layer is configured for a regression problem. If false the output
+                              is configured with a softmax function.
+        :param crop_top:      If >0 the image will be cropped from top row by given number of pixels.
+        :param crop_bottom:   If >0 the image will be cropped from bottom by given number of pixels.
+        :param steering_angle_correction: Correction for left and right image steering angles in degree.
+        :param weights_path:  Path to trained model parameters. If set, the model will be initialized by these parameters.
+        """
+
+        self.input_width = input_width
+        self.input_height = input_height
+        self.input_depth = input_depth
+        self.nb_classes = nb_classes
+        self.regression = regression
+        self.crop_top = crop_top
+        self.crop_bottom = crop_bottom
+        self.steering_angle_correction = steering_angle_correction
+        self.weights_path = weights_path
 
     def generator(self, samples, batch_size=128):
         """ Generator
@@ -48,11 +74,23 @@ class BaseNetwork:
                 angles = []
 
                 for batch_sample in batch_samples:
-                    current_path = self.path_to_image_data + '/' + batch_sample[0].lstrip()
-                    center_image = cv2.imread(current_path)
+                    # load images
+                    center_image = cv2.imread(self.path_to_image_data + '/' + batch_sample[0].lstrip())
+                    left_image = cv2.imread(self.path_to_image_data + '/' + batch_sample[1].lstrip())
+                    right_image = cv2.imread(self.path_to_image_data + '/' + batch_sample[2].lstrip())
+
+                    # adjust steering angles for left and right images
                     center_angle = float(batch_sample[3])
+                    left_angle = center_angle + math.radians(self.steering_angle_correction)
+                    right_angle = center_angle - math.radians(self.steering_angle_correction)
+
                     images.append(center_image)
+                    images.append(left_image)
+                    images.append(right_image)
+
                     angles.append(center_angle)
+                    angles.append(left_angle)
+                    angles.append(right_angle)
 
                 # convert to numpy arrays
                 x_train = np.array(images)
