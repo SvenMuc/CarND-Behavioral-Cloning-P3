@@ -12,11 +12,11 @@ class BaseNetwork:
     input_height = 0                 # Height of the input layer
     input_depth = 0                  # Depth of the input layer (e.g. number of channels of an image)
     nb_classes = 1                   # Number of output classes resp. number of regression values
-    regression = False               # If true, the network is setup as regression problem. Otherwise for classification.
-    crop_top = 0                     # Number of pixels the image is cropped from top row.
-    crop_bottom = 0                  # Number of pixels the image is cropped from bottom row.
-    steering_angle_correction = 0.0  # Correction of steering angles for left and right images in degrees.
-    weights_path = ''                # Path to trained model weights.
+    regression = False               # If true, the network is setup as regression problem. Otherwise for classification
+    crop_top = 0                     # Number of pixels the image is cropped from top row
+    crop_bottom = 0                  # Number of pixels the image is cropped from bottom row
+    steering_angle_correction = 0.0  # Correction of steering angles for left and right images
+    weights_path = ''                # Path to trained model weights
     model = None                     # Keras model
     batch_size = 128                 # Batch size for training
     train_generator = None           # Generator for training date
@@ -78,6 +78,11 @@ class BaseNetwork:
                     center_image = cv2.imread(self.path_to_image_data + '/' + batch_sample[0].lstrip())
                     left_image = cv2.imread(self.path_to_image_data + '/' + batch_sample[1].lstrip())
                     right_image = cv2.imread(self.path_to_image_data + '/' + batch_sample[2].lstrip())
+
+                    # cv2.imaread returns BGR images, covert to RGB because simulator delivers RGB images
+                    center_image = cv2.cvtColor(center_image, cv2.COLOR_BGR2RGB)
+                    left_image = cv2.cvtColor(left_image, cv2.COLOR_BGR2RGB)
+                    right_image = cv2.cvtColor(right_image, cv2.COLOR_BGR2RGB)
 
                     # adjust steering angles for left and right images
                     center_angle = float(batch_sample[3])
