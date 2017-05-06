@@ -2,9 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ea67561f-5d58-4312-8e80-32ff379bba09" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dictionaries/Sven.xml" afterPath="$PROJECT_DIR$/.idea/dictionaries/Sven.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data_augmentation.py" afterPath="$PROJECT_DIR$/data_augmentation.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/model.py" afterPath="$PROJECT_DIR$/model.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/networks/BaseNetwork.py" afterPath="$PROJECT_DIR$/networks/BaseNetwork.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/networks/LeNet.py" afterPath="$PROJECT_DIR$/networks/LeNet.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/networks/NvidiaCNN.py" afterPath="$PROJECT_DIR$/networks/NvidiaCNN.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/networks/VGG.py" afterPath="$PROJECT_DIR$/networks/VGG.py" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -20,35 +25,24 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="drive.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/drive.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1335">
-              <caret line="105" column="17" lean-forward="false" selection-start-line="105" selection-start-column="17" selection-end-line="105" selection-end-column="17" />
-              <folding>
-                <element signature="e#0#15#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="model.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="model.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="24" column="31" lean-forward="false" selection-start-line="24" selection-start-column="31" selection-end-line="24" selection-end-column="31" />
+            <state relative-caret-position="75">
+              <caret line="168" column="9" lean-forward="true" selection-start-line="168" selection-start-column="9" selection-end-line="168" selection-end-column="9" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
+                <marker date="1494019546000" expanded="true" signature="3778:4128" ph="&quot;&quot;&quot;Initializes and trains the selected network....&quot;&quot;&quot;" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="data_augmentation.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="data_augmentation.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data_augmentation.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="343" column="0" lean-forward="false" selection-start-line="343" selection-start-column="0" selection-end-line="343" selection-end-column="0" />
+            <state relative-caret-position="156">
+              <caret line="260" column="0" lean-forward="false" selection-start-line="260" selection-start-column="0" selection-end-line="260" selection-end-column="0" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -59,8 +53,8 @@
       <file leaf-file-name="BaseNetwork.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/networks/BaseNetwork.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1170">
-              <caret line="82" column="80" lean-forward="false" selection-start-line="82" selection-start-column="80" selection-end-line="82" selection-end-column="80" />
+            <state relative-caret-position="1245">
+              <caret line="86" column="78" lean-forward="false" selection-start-line="86" selection-start-column="78" selection-end-line="86" selection-end-column="78" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -71,8 +65,8 @@
       <file leaf-file-name="NvidiaCNN.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/networks/NvidiaCNN.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="465">
-              <caret line="38" column="46" lean-forward="false" selection-start-line="38" selection-start-column="46" selection-end-line="38" selection-end-column="46" />
+            <state relative-caret-position="360">
+              <caret line="31" column="24" lean-forward="false" selection-start-line="31" selection-start-column="24" selection-end-line="31" selection-end-column="24" />
               <folding>
                 <element signature="e#0#44#0" expanded="true" />
               </folding>
@@ -84,7 +78,7 @@
         <entry file="file://$PROJECT_DIR$/ec2_instance_update_model.sh">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="105">
-              <caret line="7" column="21" lean-forward="false" selection-start-line="7" selection-start-column="21" selection-end-line="7" selection-end-column="21" />
+              <caret line="7" column="20" lean-forward="false" selection-start-line="7" selection-start-column="20" selection-end-line="7" selection-end-column="20" />
               <folding />
             </state>
           </provider>
@@ -93,8 +87,8 @@
       <file leaf-file-name="ec2_instance_get_trained_model.sh" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ec2_instance_get_trained_model.sh">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="5" column="0" lean-forward="false" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+            <state relative-caret-position="120">
+              <caret line="8" column="18" lean-forward="false" selection-start-line="8" selection-start-column="18" selection-end-line="8" selection-end-column="46" />
               <folding />
             </state>
           </provider>
@@ -121,10 +115,26 @@
       <find>degrees</find>
       <find>rand</find>
       <find>ceil</find>
+      <find>$USER_HOME$/Desktop/data_1_lap_backwards/IMG</find>
+      <find>$USER_HOME$/Desktop/data_1_lap_forwards/IMG</find>
+      <find>$USER_HOME$/Desktop/data_recovery/IMG</find>
+      <find>,</find>
+      <find>STEERING_ANGLE_CORRECTION</find>
+      <find>0.000</find>
+      <find>0.8</find>
+      <find>0.6</find>
+      <find>0.5</find>
+      <find>-0.5</find>
+      <find>$USER_HOME$/Desktop/data_test/IMG</find>
     </findStrings>
     <replaceStrings>
       <replace>self.model</replace>
       <replace>'</replace>
+      <replace>IMG_track1_backwards</replace>
+      <replace>IMG_track1_forwards</replace>
+      <replace>IMG_track1_recovery</replace>
+      <replace>,</replace>
+      <replace>IMG_track1_special_scenes</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -144,14 +154,21 @@
         <option value="$PROJECT_DIR$/writeup_template.md" />
         <option value="$PROJECT_DIR$/BaseNetwork.py" />
         <option value="$PROJECT_DIR$/LeNet.py" />
+        <option value="$PROJECT_DIR$/data/driving_log_track1_udacity.csv" />
+        <option value="$PROJECT_DIR$/data/driving_log_track1_recovery.csv" />
+        <option value="$PROJECT_DIR$/data/driving_log_track1_forwards.csv" />
+        <option value="$PROJECT_DIR$/data/driving_log_track1_backwards.csv" />
+        <option value="$PROJECT_DIR$/data/test.csv" />
+        <option value="$PROJECT_DIR$/networks/NvidiaCNN.py" />
         <option value="$PROJECT_DIR$/networks/LeNet.py" />
         <option value="$PROJECT_DIR$/networks/VGG.py" />
-        <option value="$PROJECT_DIR$/networks/NvidiaCNN.py" />
-        <option value="$PROJECT_DIR$/model.py" />
+        <option value="$PROJECT_DIR$/test_model.py" />
         <option value="$PROJECT_DIR$/networks/BaseNetwork.py" />
+        <option value="$PROJECT_DIR$/data/driving_log_track1_special_scenes.csv" />
+        <option value="$PROJECT_DIR$/model.py" />
+        <option value="$PROJECT_DIR$/data_augmentation.py" />
         <option value="$PROJECT_DIR$/ec2_instance_update_model.sh" />
         <option value="$PROJECT_DIR$/ec2_instance_get_trained_model.sh" />
-        <option value="$PROJECT_DIR$/data_augmentation.py" />
       </list>
     </option>
   </component>
@@ -159,7 +176,6 @@
     <treeState />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-1" />
     <option name="y" value="23" />
     <option name="width" value="1680" />
     <option name="height" value="986" />
@@ -180,6 +196,9 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -202,15 +221,12 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="networks" />
+              <option name="myItemId" value="data" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
-      <pane id="Scope" />
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -275,6 +291,24 @@
       <option name="EMULATE_TERMINAL" value="false" />
       <method />
     </configuration>
+    <configuration default="false" name="test_model" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="CarND-Behavioral-Cloning-P3" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test_model.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <method />
+    </configuration>
     <configuration default="false" name="data_augmentation" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -288,7 +322,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="CarND-Behavioral-Cloning-P3" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/data_augmentation.py" />
-      <option name="PARAMETERS" value="-a" />
+      <option name="PARAMETERS" value="-s ./data/driving_log_track1_forwards.csv" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <method />
@@ -523,16 +557,18 @@
       <option name="_new_targetType" value="&quot;PATH&quot;" />
       <method />
     </configuration>
-    <list size="3">
+    <list size="4">
       <item index="0" class="java.lang.String" itemvalue="Python.summarize_training_results" />
       <item index="1" class="java.lang.String" itemvalue="Python.model" />
-      <item index="2" class="java.lang.String" itemvalue="Python.data_augmentation" />
+      <item index="2" class="java.lang.String" itemvalue="Python.test_model" />
+      <item index="3" class="java.lang.String" itemvalue="Python.data_augmentation" />
     </list>
     <recent_temporary>
-      <list size="3">
+      <list size="4">
         <item index="0" class="java.lang.String" itemvalue="Python.data_augmentation" />
-        <item index="1" class="java.lang.String" itemvalue="Python.model" />
-        <item index="2" class="java.lang.String" itemvalue="Python.summarize_training_results" />
+        <item index="1" class="java.lang.String" itemvalue="Python.test_model" />
+        <item index="2" class="java.lang.String" itemvalue="Python.model" />
+        <item index="3" class="java.lang.String" itemvalue="Python.summarize_training_results" />
       </list>
     </recent_temporary>
     <configuration name="&lt;template&gt;" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" default="true" selected="false">
@@ -570,7 +606,8 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-1" y="23" width="1680" height="986" extended-state="6" />
+    <frame x="0" y="23" width="1680" height="986" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32997763" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -581,7 +618,7 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32997763" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32997763" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2973138" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21306472" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24969475" sideWeight="0.49552572" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -643,7 +680,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="38" />
+      <option name="time" value="45" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -652,86 +689,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/model.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3045">
-          <caret line="215" column="21" lean-forward="false" selection-start-line="215" selection-start-column="21" selection-end-line="215" selection-end-column="21" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/drive.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1335">
-          <caret line="105" column="17" lean-forward="false" selection-start-line="105" selection-start-column="17" selection-end-line="105" selection-end-column="17" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/model.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4050">
-          <caret line="283" column="21" lean-forward="false" selection-start-line="283" selection-start-column="21" selection-end-line="283" selection-end-column="21" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/networks/LeNet.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1245">
-          <caret line="90" column="33" lean-forward="false" selection-start-line="90" selection-start-column="33" selection-end-line="90" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ec2_instance_update_model.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="52" lean-forward="false" selection-start-line="11" selection-start-column="52" selection-end-line="11" selection-end-column="52" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ec2_instance_get_trained_model.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="12" column="66" lean-forward="false" selection-start-line="12" selection-start-column="48" selection-end-line="12" selection-end-column="66" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/drive.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1335">
-          <caret line="105" column="17" lean-forward="false" selection-start-line="105" selection-start-column="17" selection-end-line="105" selection-end-column="17" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/model.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4050">
-          <caret line="283" column="21" lean-forward="false" selection-start-line="283" selection-start-column="21" selection-end-line="283" selection-end-column="21" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/networks/LeNet.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1245">
-          <caret line="90" column="33" lean-forward="false" selection-start-line="90" selection-start-column="33" selection-end-line="90" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ec2_instance_update_model.sh">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="165">
@@ -753,9 +710,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -765,6 +719,7 @@
           <caret line="277" column="23" lean-forward="true" selection-start-line="277" selection-start-column="23" selection-end-line="277" selection-end-column="23" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
+            <marker date="1494019546000" expanded="true" signature="3778:4128" ph="&quot;&quot;&quot;Initializes and trains the selected network....&quot;&quot;&quot;" />
           </folding>
         </state>
       </provider>
@@ -788,9 +743,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -800,6 +752,7 @@
           <caret line="223" column="24" lean-forward="false" selection-start-line="223" selection-start-column="24" selection-end-line="223" selection-end-column="24" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
+            <marker date="1494019546000" expanded="true" signature="3778:4128" ph="&quot;&quot;&quot;Initializes and trains the selected network....&quot;&quot;&quot;" />
           </folding>
         </state>
       </provider>
@@ -824,9 +777,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="660">
           <caret line="60" column="33" lean-forward="false" selection-start-line="60" selection-start-column="33" selection-end-line="60" selection-end-column="33" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -836,6 +786,7 @@
           <caret line="177" column="0" lean-forward="false" selection-start-line="177" selection-start-column="0" selection-end-line="177" selection-end-column="0" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
+            <marker date="1494019546000" expanded="true" signature="3778:4128" ph="&quot;&quot;&quot;Initializes and trains the selected network....&quot;&quot;&quot;" />
           </folding>
         </state>
       </provider>
@@ -852,9 +803,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -864,6 +812,7 @@
           <caret line="16" column="0" lean-forward="true" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
+            <marker date="1494019546000" expanded="true" signature="3778:4128" ph="&quot;&quot;&quot;Initializes and trains the selected network....&quot;&quot;&quot;" />
           </folding>
         </state>
       </provider>
@@ -872,9 +821,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -900,13 +846,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ec2_instance_update_model_files" />
-    <entry file="file://$USER_HOME$/miniconda3/envs/carnd-term1/lib/python3.5/site-packages/tensorflow/python/client/session.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="191">
-          <caret line="580" column="0" lean-forward="false" selection-start-line="580" selection-start-column="0" selection-end-line="580" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/miniconda3/envs/carnd-term1/lib/python3.5/pickle.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -933,16 +872,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/drive.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1335">
-          <caret line="105" column="17" lean-forward="false" selection-start-line="105" selection-start-column="17" selection-end-line="105" selection-end-column="17" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/miniconda3/envs/carnd-term1/lib/python3.5/site-packages/matplotlib/mlab.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="191">
@@ -957,51 +886,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/miniconda3/envs/carnd-term1/lib/python3.5/codecs.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="308" column="0" lean-forward="false" selection-start-line="308" selection-start-column="0" selection-end-line="308" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/miniconda3/envs/carnd-term1/lib/python3.5/site-packages/keras/engine/training.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="324">
           <caret line="436" column="12" lean-forward="true" selection-start-line="436" selection-start-column="12" selection-end-line="436" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/networks/LeNet.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="32" column="99" lean-forward="false" selection-start-line="32" selection-start-column="99" selection-end-line="32" selection-end-column="99" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/networks/VGG.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="375">
-          <caret line="33" column="0" lean-forward="false" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/networks/BaseNetwork.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1170">
-          <caret line="82" column="80" lean-forward="false" selection-start-line="82" selection-start-column="80" selection-end-line="82" selection-end-column="80" />
-          <folding>
-            <element signature="e#0#13#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/networks/NvidiaCNN.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="465">
-          <caret line="38" column="46" lean-forward="false" selection-start-line="38" selection-start-column="46" selection-end-line="38" selection-end-column="46" />
-          <folding>
-            <element signature="e#0#44#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1012,38 +900,153 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ec2_instance_update_model.sh">
+    <entry file="file://$PROJECT_DIR$/data/driving_log_track1_recovery.csv">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="7" column="21" lean-forward="false" selection-start-line="7" selection-start-column="21" selection-end-line="7" selection-end-column="21" />
+        <state relative-caret-position="0">
+          <caret line="0" column="47" lean-forward="false" selection-start-line="0" selection-start-column="47" selection-end-line="0" selection-end-column="47" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/driving_log_track1_backwards.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" column="0" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/driving_log_track1_forwards.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="565">
+          <caret line="2052" column="0" lean-forward="false" selection-start-line="2052" selection-start-column="0" selection-end-line="2052" selection-end-column="176" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/networks/VGG.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="31" column="44" lean-forward="false" selection-start-line="31" selection-start-column="44" selection-end-line="31" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/networks/LeNet.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="465">
+          <caret line="31" column="46" lean-forward="false" selection-start-line="31" selection-start-column="46" selection-end-line="31" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/driving_log_track1_udacity.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="30" column="0" lean-forward="false" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="174" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/test.csv" />
+    <entry file="file://$PROJECT_DIR$/data/test_model.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/miniconda3/envs/carnd-term1/lib/python3.5/site-packages/tensorflow/python/client/session.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="191">
+          <caret line="580" column="0" lean-forward="false" selection-start-line="580" selection-start-column="0" selection-end-line="580" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/drive.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="660">
+          <caret line="60" column="33" lean-forward="false" selection-start-line="60" selection-start-column="33" selection-end-line="60" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/driving_log_track1_special_scenes.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="33510">
+          <caret line="2234" column="0" lean-forward="true" selection-start-line="2234" selection-start-column="0" selection-end-line="2234" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test_model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="125">
+          <caret line="66" column="0" lean-forward="false" selection-start-line="66" selection-start-column="0" selection-end-line="66" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/networks/BaseNetwork.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1245">
+          <caret line="86" column="78" lean-forward="false" selection-start-line="86" selection-start-column="78" selection-end-line="86" selection-end-column="78" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/networks/NvidiaCNN.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="31" column="24" lean-forward="false" selection-start-line="31" selection-start-column="24" selection-end-line="31" selection-end-column="24" />
+          <folding>
+            <element signature="e#0#44#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/miniconda3/envs/carnd-term1/lib/python3.5/site-packages/scipy/interpolate/interpolate.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="190">
+          <caret line="420" column="0" lean-forward="false" selection-start-line="420" selection-start-column="0" selection-end-line="420" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ec2_instance_get_trained_model.sh">
+    <entry file="file://$USER_HOME$/miniconda3/envs/carnd-term1/lib/python3.5/codecs.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="0" lean-forward="false" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+        <state relative-caret-position="4620">
+          <caret line="308" column="0" lean-forward="false" selection-start-line="308" selection-start-column="0" selection-end-line="308" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/model.py">
+    <entry file="file://$PROJECT_DIR$/data_augmentation.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="24" column="31" lean-forward="false" selection-start-line="24" selection-start-column="31" selection-end-line="24" selection-end-column="31" />
+        <state relative-caret-position="156">
+          <caret line="260" column="0" lean-forward="false" selection-start-line="260" selection-start-column="0" selection-end-line="260" selection-end-column="0" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data_augmentation.py">
+    <entry file="file://$PROJECT_DIR$/ec2_instance_update_model.sh">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="343" column="0" lean-forward="false" selection-start-line="343" selection-start-column="0" selection-end-line="343" selection-end-column="0" />
+        <state relative-caret-position="105">
+          <caret line="7" column="20" lean-forward="false" selection-start-line="7" selection-start-column="20" selection-end-line="7" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ec2_instance_get_trained_model.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" column="18" lean-forward="false" selection-start-line="8" selection-start-column="18" selection-end-line="8" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="168" column="9" lean-forward="true" selection-start-line="168" selection-start-column="9" selection-end-line="168" selection-end-column="9" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
+            <marker date="1494019546000" expanded="true" signature="3778:4128" ph="&quot;&quot;&quot;Initializes and trains the selected network....&quot;&quot;&quot;" />
           </folding>
         </state>
       </provider>

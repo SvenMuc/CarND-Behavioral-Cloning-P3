@@ -16,18 +16,18 @@ CFG_DATASET_PATH = './data' # Path to dataset
 
 # hyperparameters
 VALIDATION_SET_SIZE = 0.2   # proportion of full dataset used for the test set
-NB_EPOCHS = 10              # default number of training epochs
+NB_EPOCHS = 10               # default number of training epochs
 BATCH_SIZE = 128            # default training batch size (number of images per batch)
 CROP_IMAGE_TOP = 60         # number of pixels the image shall be cropped at top row
 CROP_IMAGE_BOTTOM = 20      # number of pixels the image shall be cropped at bottom row
 
 # augmentation
-STEERING_ANGLE_CORRECTION = 2.5 # Steering angle correction for left and right images in degree
+STEERING_ANGLE_CORRECTION = 6.25  # Steering angle correction for left and right images in degree
 
 
 def show_configuration(dataset_csv_filename):
     """ Shows a summary of the actual configuration.
-    
+
     :param dataset_csv_filename: Dataset CSV filename.
     """
 
@@ -55,11 +55,11 @@ def show_configuration(dataset_csv_filename):
 
 def prepare_datasets(csv_filename, validation_set_proportion=0.0):
     """ Prepares the training and validation datasets (images and measurements) from driving log cvs file.
-    
+
     :param csv_filename:              Path and filename of CVS file.
-    :param validation_set_proportion: Proportion of the full dataset used for the validation set. If set to 0.0 only 
+    :param validation_set_proportion: Proportion of the full dataset used for the validation set. If set to 0.0 only
                                       one sample array is returned. Default = 0.0
-    
+
     :return: Returns the train_samples and validation_samples dataset.
     """
 
@@ -84,7 +84,7 @@ def prepare_datasets(csv_filename, validation_set_proportion=0.0):
 
 def plot_training_statistics(history):
     """ Plots the fit history statistics like training and validation loss.
-    
+
     :param history: History of model training ['loss', 'val_loss'].
     """
     plt.plot(history['loss'], 'x-')
@@ -98,14 +98,15 @@ def plot_training_statistics(history):
     plt.show()
 
 
-def train_model(model, dataset_csv_filename):
+def train_model(model, dataset_csv_filename, trained_model=None):
     """ Initializes and trains the selected network.
-    
+
     :param model:           Supported models are
                              - LeNet5
                              - NvidiaCNN
                              - VGG16
-    :dataset_csv_filename:  Path to dataset csv filename.
+    :param dataset_csv_filename:  Path to dataset csv filename.
+    :param trained_model:   Trained model file (*.h5). If set, the model will be retrained by the given dataset.
     """
 
     supported_models = ['LeNet5', 'NvidiaCNN', 'VGG16']
@@ -132,18 +133,21 @@ def train_model(model, dataset_csv_filename):
         # setup LeNet-5 model architecture
         network = LeNet(input_depth=3, input_height=160, input_width=320, regression=True, nb_classes=1,
                         crop_top=CROP_IMAGE_TOP, crop_bottom=CROP_IMAGE_BOTTOM,
-                        steering_angle_correction=STEERING_ANGLE_CORRECTION)
+                        steering_angle_correction=STEERING_ANGLE_CORRECTION,
+                        weights_path=trained_model)
     elif model == 'NvidiaCNN':
         # setup NVIDIA CNN model architecture
         network = NvidiaCNN(input_depth=3, input_height=160, input_width=320, regression=True, nb_classes=1,
                             crop_top=CROP_IMAGE_TOP, crop_bottom=CROP_IMAGE_BOTTOM,
-                            steering_angle_correction=STEERING_ANGLE_CORRECTION)
+                            steering_angle_correction=STEERING_ANGLE_CORRECTION,
+                            weights_path=trained_model)
         NB_EPOCHS = 7
     elif model == 'VGG16':
         # setup VGG-16 model architecture
         network = VGG(input_depth=3, input_height=160, input_width=320, regression=True, nb_classes=1,
                       crop_top=CROP_IMAGE_TOP, crop_bottom=CROP_IMAGE_BOTTOM,
-                      steering_angle_correction=STEERING_ANGLE_CORRECTION)
+                      steering_angle_correction=STEERING_ANGLE_CORRECTION,
+                      weights_path=trained_model)
 
         # reduced batch size due to memory limitation on AWS and optimized number of epochs
         BATCH_SIZE = 16
@@ -153,11 +157,18 @@ def train_model(model, dataset_csv_filename):
         exit(-1)
 
     show_configuration(dataset_csv_filename)
+    print('{:s} Network Summary'.format(network.model_name))
+    network.summary()
 
     # setup training and validation generators
     network.setup_training_validation_generators(train_samples, validation_samples, CFG_DATASET_PATH, BATCH_SIZE)
 
     # train the model
+    if trained_model is None:
+        print('Train model:')
+    else:
+        print('Retrain model \'{:s}\':'.format(trained_model))
+
     network.train(NB_EPOCHS)
 
     # save the training results
@@ -173,6 +184,13 @@ if __name__ == "__main__":
         help='Trains the model. Supported MODELS=\'LeNet5\', \'NvidiaCNN\', \'VGG16\'.',
         dest='train_model',
         metavar='MODEL'
+    )
+
+    parser.add_argument(
+        '-m', '--model',
+        help='Retrains the given model. Select model by -t.',
+        dest='retrain_model',
+        metavar='MODEL_FILE'
     )
 
     parser.add_argument(
@@ -196,6 +214,13 @@ if __name__ == "__main__":
         metavar="FILE"
     )
 
+    parser.add_argument(
+        '-smg', '--safe-model-graph',
+        help='Saves the model graph to a PNG file.',
+        dest='safe_model_graph',
+        metavar="FILE"
+    )
+
     args = parser.parse_args()
 
     if len(sys.argv) == 1:
@@ -208,9 +233,13 @@ if __name__ == "__main__":
         if args.dataset_filename is None:
             print('Use -d CSV_FILE parameter to specify the training/validation dataset.')
         elif os.path.exists(args.dataset_filename):
-            train_model(args.train_model, args.dataset_filename)
+            if args.retrain_model:
+                train_model(args.train_model, args.dataset_filename, args.retrain_model)
+            else:
+                train_model(args.train_model, args.dataset_filename)
         else:
             print('Dataset CSV file \'{:s}\' not found.'.format(args.dataset_filename))
+
     elif args.visualize_dataset_csv:
         # Prepare data sets and show random training and validation sample
         print('Preparing training and validation datasets...', end='', flush=True)
@@ -219,6 +248,7 @@ if __name__ == "__main__":
 
         print('Show random dataset samples:')
         visualize_data_set(samples, title='Dataset', dataset_path=CFG_DATASET_PATH)
+
     elif args.history_filename:
         # unpickle history object and plot training and validation loss
         if os.path.isfile(args.history_filename):
@@ -227,3 +257,7 @@ if __name__ == "__main__":
                 plot_training_statistics(history)
         else:
             print('History object file \"{:s}\" not found.'.format(args.history_filename))
+
+    elif args.safe_model_graph:
+        # TODO: safes the model graph to a PNG file
+        print('Safe model graph')

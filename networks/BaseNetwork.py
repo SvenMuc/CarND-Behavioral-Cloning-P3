@@ -1,13 +1,13 @@
 import pickle
 import cv2
-import math
 import numpy as np
 from sklearn.utils import shuffle
-
+# TODO: from keras.utils.visualize_util import plot
 
 class BaseNetwork:
     """ Provides the base routines to train a network architecture and to store the training results. """
 
+    model_name = ''                  # Name of the model (e.g. NVIDIA_CNN or LeNet5)
     input_width = 0                  # Width of the input layer
     input_height = 0                 # Height of the input layer
     input_depth = 0                  # Depth of the input layer (e.g. number of channels of an image)
@@ -26,10 +26,11 @@ class BaseNetwork:
     path_to_image_data = ''          # Path to image data (replaces the path in the train/valid samples)
     history_object = None            # History object contains the loss and val_loss data after network training
 
-    def __init__(self, input_width, input_height, input_depth, nb_classes, regression=False,
+    def __init__(self, model_name, input_width, input_height, input_depth, nb_classes, regression=False,
                  crop_top=0, crop_bottom=0, steering_angle_correction=0.0, weights_path=None):
         """ Initializes the base network.
         
+        :param model_name:    Name of the model (e.g NvidiaCNN, LeNet5, etc).
         :param input_width:   Width of the input image.
         :param input_height:  Height if the input image.
         :param input_depth:   Depth of the input image (e.g. number of channels).
@@ -43,6 +44,7 @@ class BaseNetwork:
         :param weights_path:  Path to trained model parameters. If set, the model will be initialized by these parameters.
         """
 
+        self.model_name = model_name
         self.input_width = input_width
         self.input_height = input_height
         self.input_depth = input_depth
@@ -50,7 +52,7 @@ class BaseNetwork:
         self.regression = regression
         self.crop_top = crop_top
         self.crop_bottom = crop_bottom
-        self.steering_angle_correction = steering_angle_correction
+        self.steering_angle_correction = steering_angle_correction / 25.    # normalize angle from -25°..25° to -1..1
         self.weights_path = weights_path
 
     def generator(self, samples, batch_size=128):
@@ -79,15 +81,15 @@ class BaseNetwork:
                     left_image = cv2.imread(self.path_to_image_data + '/' + batch_sample[1].lstrip())
                     right_image = cv2.imread(self.path_to_image_data + '/' + batch_sample[2].lstrip())
 
-                    # cv2.imaread returns BGR images, covert to RGB because simulator delivers RGB images
+                    # cv2.imread returns BGR images, covert to RGB because simulator delivers RGB images
                     center_image = cv2.cvtColor(center_image, cv2.COLOR_BGR2RGB)
                     left_image = cv2.cvtColor(left_image, cv2.COLOR_BGR2RGB)
                     right_image = cv2.cvtColor(right_image, cv2.COLOR_BGR2RGB)
 
                     # adjust steering angles for left and right images
                     center_angle = float(batch_sample[3])
-                    left_angle = center_angle + math.radians(self.steering_angle_correction)
-                    right_angle = center_angle - math.radians(self.steering_angle_correction)
+                    left_angle = center_angle + self.steering_angle_correction
+                    right_angle = center_angle - self.steering_angle_correction
 
                     images.append(center_image)
                     images.append(left_image)
@@ -153,3 +155,14 @@ class BaseNetwork:
         """
         self.model.save(filename)
         print('Model saved to {:s}'.format(filename))
+
+    def summary(self):
+        """ Print a model representation summary."""
+        self.model.summary()
+
+    # def save_model_graph(self, filename):
+    #     """ Saves the model graph to a PNG file.
+    #
+    #     :param filename: Output filename (*.png).
+    #     """
+    #     plot(self.model, to_file=filename, show_shapes=True, show_layer_names=True)

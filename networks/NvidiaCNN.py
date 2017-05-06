@@ -28,7 +28,7 @@ class NvidiaCNN(BaseNetwork):
         :param weights_path:  Path to trained model parameters. If set, the model will be initialized by these parameters.
         """
 
-        super(NvidiaCNN, self).__init__(input_width, input_height, input_depth, nb_classes, regression,
+        super(NvidiaCNN, self).__init__('NvidiaCNN', input_width, input_height, input_depth, nb_classes, regression,
                                         crop_top, crop_bottom, steering_angle_correction, weights_path)
 
         print('NVIDIA CNN Configuration:')

@@ -9,6 +9,7 @@ import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import norm
+from scipy import signal
 from sklearn.model_selection import train_test_split
 
 
@@ -79,6 +80,53 @@ def plot_steering_angle_histogram(steering_angles, title='Histogram of steering 
     if show:
         plt.show()
 
+def plot_odometry(samples, title='', show=True):
+    """ Plot odometry (steering angle, throttle, brake and speed) diagram.
+    
+    :param samples: Samples in format [center, left, right, steering, throttle, brake, speed].
+    :param title:   Title of the diagram
+    :param show:    If true, `plot.show()` is called at the end.
+    """
+
+    # prepare odometry data
+    angles = []
+    throttle = []
+    brake = []
+    speed = []
+
+    for sample in samples:
+        angles.append(float(sample[3]) * 25.)
+        throttle.append(float(sample[4]))
+        brake.append(float(sample[5]))
+        speed.append(float(sample[6]))
+
+    fig, axarr = plt.subplots(4, figsize=[10, 8], sharex=True)
+
+    # plot steering angle in degree
+    axarr[0].plot(angles, label='steering angle')
+    axarr[0].set_ylabel('steering angle [°]')
+    axarr[0].grid(True)
+
+    # plot throttle
+    axarr[1].plot(throttle, label='throttle')
+    axarr[1].set_ylabel('throttle')
+    axarr[1].grid(True)
+
+    # plot brake
+    axarr[2].plot(brake, label='brake')
+    axarr[2].set_ylabel('brake')
+    axarr[2].grid(True)
+
+    # plot speed
+    axarr[3].plot(speed, label='speed')
+    axarr[3].set_xlabel('#sample')
+    axarr[3].set_ylabel('speed [mp/h]')
+    axarr[3].grid(True)
+
+    fig.suptitle(title)
+
+    if show:
+        plt.show()
 
 def visualize_data_set(samples, title='', dataset_path=''):
     """ Visualize the data set (random image) and ground truth data.
@@ -159,23 +207,114 @@ def visualize_data_set(samples, title='', dataset_path=''):
     plt.show()
 
 
-def augment_dataset(source_directory, destination_directory, reduce_zero_steering_angles=0., steering_angle_threshold=-1.):
+def smooth_steering_angle(csv_file):
+    """ Smooths the steering angle.
+    
+    :param csv_file: CSV file containing the measurements (steering angle shall be at position 3).
+    """
+
+    print('Preparing training and validation datasets...', end='', flush=True)
+    samples = prepare_datasets(csv_file)
+    print('done')
+
+    filename = csv_file[0:csv_file.rfind('.')] + '_smoothed.csv'
+    print('Smooth steering angles...', end='', flush=True)
+
+    angles = np.empty(0)
+
+    for sample in samples:
+        angles = np.append(angles, float(sample[3]))
+
+    # interpolate data
+    x = np.arange(len(angles))
+    window = signal.hann(15)
+    angles_filtered = signal.convolve(angles, window, mode='same') / sum(window)
+
+    # write filtered steering angle to csv file
+    file = open(filename, 'w')
+    fieldnames = ['center', 'left', 'right', 'steering', 'throttle', 'brake', 'speed']
+    writer = csv.DictWriter(file, fieldnames=fieldnames)
+    writer.writeheader()
+
+    for idx, sample in enumerate(samples):
+        writer.writerow({'center': sample[0],
+                         'left': sample[1],
+                         'right': sample[2],
+                         'steering': str(angles_filtered[idx]),
+                         'throttle': sample[4],
+                         'brake': sample[5],
+                         'speed': sample[6]})
+
+    print('done')
+    print('Close the figures to continue...')
+
+    # plot steering angle in degree
+    fig = plt.figure(figsize=(10, 3))
+    plt.plot(angles * 25., 'b', label='raw steering angle')
+    plt.plot(angles_filtered * 25., 'r', label='interpolated')
+    plt.ylabel('steering angle [°]')
+    plt.grid(True)
+    plt.title('Smoothed Steering Angle')
+    plt.legend()
+    plt.show()
+
+
+def merge_csv_files(source_file_1, source_file_2, merged_file):
+    """ Merges two CSV files.
+    
+    :param source_file_1: Path and name of first CSV file.
+    :param source_file_2: Path and name of second CSV file.
+    :param merged_file:   Path and name of merged CSV file.
+    """
+
+    # check for valid path and filenames
+    if not os.path.isfile(source_file_1):
+        print('ERROR: Source file 1 \'{:s}\' not found.'.format(source_file_1))
+        exit(-1)
+
+    if not os.path.isfile(source_file_2):
+        print('ERROR: Source file 2 \'{:s}\' not found.'.format(source_file_2))
+        exit(-1)
+
+    if os.path.isfile(merged_file):
+        print('ERROR: Merged file \'{:s}\' already exists. Rename merge file.'.format(merged_file))
+
+    # merge files
+    print('Merging CSV files: {:s} + {:s} ==> {:s} ...'.format(source_file_1, source_file_2, merged_file), end='', flush=True)
+    header_saved = False
+
+    with open(merged_file, 'wb') as f_merged:
+        for filename in [source_file_1, source_file_2]:
+            with open(filename, 'rb') as f_in:
+                header = next(f_in)
+                if not header_saved:
+                    f_merged.write(header)
+                    header_saved = True
+                for line in f_in:
+                    f_merged.write(line)
+    print('done')
+
+
+def augment_dataset(csv_file, source_directory, destination_directory,
+                    reduce_zero_steering_angles=0.,
+                    steering_angle_threshold=-1.,
+                    write_images=True):
     """ Augments the data set.
      
      Methods:
       - Flip images with curves (|steering angle| >= threshold) horizontally.
       - Reduce total number of images with 0° steering angle
     
+    :param csv_file:                 CSV file describing the dataset to augment.
     :param source_directory:         Source path of data to augment without a \ at the end.        
     :param destination_directory:    Destination path without a \ at the end to store augmented data.
     :param reduce_zero_steering_angles: Reduces total amount of samples with 0° steering angle by given percentage. 
                                         (0.0 = no reduction, 1.0 = remove all)
     :param steering_angle_threshold: Flip images with |steering angle| >= threshold [0°..25°].
+    :param write_images;             If false, the augmented images won't be saved. Only relevant for statistics!
     """
 
     # check if all source and destination directories exist
-    source_image_directory = source_directory + '/IMG'
-    source_csv_log_file = source_directory + '/driving_log.csv'
     augmented_image_sub_directory = 'IMG_augmented'
     augmented_image_directory = destination_directory + '/' + augmented_image_sub_directory
     augmented_csv_log_file = destination_directory + '/augmented_log.csv'
@@ -198,14 +337,14 @@ def augment_dataset(source_directory, destination_directory, reduce_zero_steerin
         print('Created destination directory \'{:s}\' for augmented images.'.format(augmented_image_directory))
 
     # get full dataset which shall be augmented
-    samples = np.array(prepare_datasets(source_csv_log_file, 0.0))
+    samples = np.array(prepare_datasets(csv_file, 0.0))
 
     # find images with curves by |steering angle| >= threshold
     samples_curves = []
 
     print('Number of samples:            {:d}'.format(len(samples)))
-    print('Source CVS file:              {:s}'.format(source_csv_log_file))
-    print('Source images:                {:s}'.format(source_image_directory))
+    print('Source CVS file:              {:s}'.format(csv_file))
+    print('Source directory:             {:s}'.format(source_directory))
     print('Augmented CVS file:           {:s}'.format(augmented_csv_log_file))
     print('Augmented images:             {:s}'.format(augmented_image_directory))
 
@@ -252,33 +391,33 @@ def augment_dataset(source_directory, destination_directory, reduce_zero_steerin
 
             # load and flip center, left and right image horizontally
             center_image_filename = sample[0].split('/')[-1]
-            center_image_path = source_image_directory + '/' + center_image_filename
+            center_image_path = source_directory + '/' + sample[0]
             center_image = cv2.imread(center_image_path)
 
             if center_image is None:
-                print('Image {:s} not found.'.format(center_image_path))
+                print('Center image {:s} not found.'.format(center_image_path))
                 exit(-1)
-            else:
+            elif write_images:
                 cv2.imwrite(augmented_image_directory + '/flipped_' + center_image_filename, cv2.flip(center_image, 1))
 
             left_image_filename = sample[1].split('/')[-1]
-            left_image_path = source_image_directory + '/' + left_image_filename
+            left_image_path = source_directory + '/' + sample[1]
             left_image = cv2.imread(left_image_path)
 
             if left_image is None:
-                print('Image {:s} not found.'.format(center_image_path))
+                print('Left image {:s} not found.'.format(sample[1]))
                 exit(-1)
-            else:
+            elif write_images:
                 cv2.imwrite(augmented_image_directory + '/flipped_' + left_image_filename, cv2.flip(left_image, 1))
 
             right_image_filename = sample[2].split('/')[-1]
-            right_image_path = source_image_directory + '/' + right_image_filename
+            right_image_path = source_directory + '/' + sample[2]
             right_image = cv2.imread(right_image_path)
 
             if right_image is None:
-                print('Image {:s} not found.'.format(center_image_path))
+                print('Right image {:s} not found.'.format(sample[2]))
                 exit(-1)
-            else:
+            elif write_images:
                 cv2.imwrite(augmented_image_directory + '/flipped_' + right_image_filename, cv2.flip(right_image, 1))
 
             # invert steering angle
@@ -317,7 +456,8 @@ def augment_dataset(source_directory, destination_directory, reduce_zero_steerin
         print('Number of removed 0° steering angle samples:               {:d}'.format(nb_samples_to_delete))
 
     if steering_angle_threshold >= 0.:
-        print('Number of augmented samples(|steering angles| >= {:.1f}°): {:5d}'.format(steering_angle_threshold * 25., len(samples_curves)))
+        print('Number of augmented samples(|steering angles| >= {:.1f}°): {:5d}'.format(steering_angle_threshold,
+                                                                                        len(samples_curves)))
 
     print('Number of samples after augmentation:                     {:5d}'.format(len(augmented_samples)))
     print('')
@@ -336,7 +476,7 @@ def augment_dataset(source_directory, destination_directory, reduce_zero_steerin
     plot_steering_angle_histogram(steering_angles, title='Before augmentation of steering angles', show=False)
 
     visualize_data_set(samples_curves, title='Images with |steering angle| >= {:.1f}°'
-                       .format(steering_angle_threshold * 25.), dataset_path=CFG_DATASET_PATH)
+                       .format(steering_angle_threshold), dataset_path=CFG_DATASET_PATH)
 
 
 if __name__ == "__main__":
@@ -357,10 +497,33 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
+        '-vo', '--visualize-odometry',
+        help='Visualizes odometry data (angle, speed, brake, throttle) in a diagram.',
+        dest='visualize_odometry_dataset_csv',
+        metavar='CSV_FILE'
+    )
+
+    parser.add_argument(
+        '-s', '--smooth-steering_angles',
+        help='Smoothes the steering angles.',
+        dest='smoth_steering_angle_csv',
+        metavar='CSV_FILE'
+    )
+
+    parser.add_argument(
+        '-m', '--merge-data-sets',
+        help='Merges two dataset CSV files (file-1, file-2, file-out).',
+        dest='merge_dataset_csv',
+        nargs=3,
+        metavar='CSV_FILE'
+    )
+
+    parser.add_argument(
         '-a', '--augment-dataset',
-        help='Augments the dataset by flipping images with curves horizontally.',
+        help='Augments the dataset (val0 = CVS file, val1 = reduce 0° steering angles [perc], val2 = flip steering angle threshold [°]), val3 = write image files',
         dest='augment_dataset',
-        action='store_true'
+        nargs=4,
+        metavar='VALUE'
     )
 
     args = parser.parse_args()
@@ -370,7 +533,7 @@ if __name__ == "__main__":
         parser.print_usage()
         parser.exit(1)
 
-    if args.visualize_dataset_csv:
+    elif args.visualize_dataset_csv:
         # Prepare data sets and show random training and validation sample
         print('Preparing training and validation datasets...', end='', flush=True)
         samples = prepare_datasets(args.visualize_dataset_csv, 0.0)
@@ -378,7 +541,20 @@ if __name__ == "__main__":
 
         visualize_data_set(samples, title='Original Dataset', dataset_path=CFG_DATASET_PATH)
 
-    if args.visualize_splitted_dataset_csv:
+    elif args.visualize_odometry_dataset_csv:
+        # plot steering angle, speed, throttle, brake and speed
+        print('Preparing datasets...', end='', flush=True)
+        samples = prepare_datasets(args.visualize_odometry_dataset_csv, 0.0)
+        print('done')
+        print('Close the figures to continue...')
+
+        plot_odometry(samples, title='Odometry Data')
+
+    elif args.smoth_steering_angle_csv:
+        # smooth steering angles
+        smooth_steering_angle(args.smoth_steering_angle_csv)
+
+    elif args.visualize_splitted_dataset_csv:
         # Prepare data sets and show random training and validation samples
         print('Preparing training and validation datasets...', end='', flush=True)
         train_samples, validation_samples = prepare_datasets(args.visualize_splitted_dataset_csv, VALIDATION_SET_SIZE)
@@ -389,6 +565,13 @@ if __name__ == "__main__":
         print('Show random validation samples:')
         visualize_data_set(validation_samples, title='Validation Dataset', dataset_path=CFG_DATASET_PATH)
 
+    elif args.merge_dataset_csv:
+        # merge two CVS files
+        merge_csv_files(args.merge_dataset_csv[0], args.merge_dataset_csv[1], args.merge_dataset_csv[2])
+
     elif args.augment_dataset:
         # augment dataset
-        augment_dataset('./data', './data', reduce_zero_steering_angles=0.8, steering_angle_threshold=4.0)
+        augment_dataset(args.augment_dataset[0], './data', './data',
+                        reduce_zero_steering_angles=float(args.augment_dataset[1]),
+                        steering_angle_threshold=float(args.augment_dataset[2]),
+                        write_images=args.augment_dataset[3])

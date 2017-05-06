@@ -9,6 +9,7 @@
       <w>mathrm</w>
       <w>mlab</w>
       <w>nvidia</w>
+      <w>odometry</w>
       <w>relu</w>
       <w>softmax</w>
     </words>
