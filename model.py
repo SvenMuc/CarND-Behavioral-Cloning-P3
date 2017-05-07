@@ -4,6 +4,7 @@ import pickle
 import sys
 import matplotlib.pyplot as plt
 import os
+from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
 from data_augmentation import visualize_data_set
 from networks.LeNet import LeNet
@@ -16,7 +17,6 @@ CFG_DATASET_PATH = './data' # Path to dataset
 
 # hyperparameters
 VALIDATION_SET_SIZE = 0.2   # proportion of full dataset used for the test set
-NB_EPOCHS = 10               # default number of training epochs
 BATCH_SIZE = 128            # default training batch size (number of images per batch)
 CROP_IMAGE_TOP = 60         # number of pixels the image shall be cropped at top row
 CROP_IMAGE_BOTTOM = 20      # number of pixels the image shall be cropped at bottom row
@@ -25,10 +25,12 @@ CROP_IMAGE_BOTTOM = 20      # number of pixels the image shall be cropped at bot
 STEERING_ANGLE_CORRECTION = 6.25  # Steering angle correction for left and right images in degree
 
 
-def show_configuration(dataset_csv_filename):
+def show_configuration(dataset_csv_filename, nb_epochs=None, learning_rate=None):
     """ Shows a summary of the actual configuration.
 
     :param dataset_csv_filename: Dataset CSV filename.
+    :param nb_epochs:            Number of training epochs.
+    :param learning_rate:        The optimizer's learning rate.
     """
 
     print('General Configuration')
@@ -45,7 +47,10 @@ def show_configuration(dataset_csv_filename):
     print('----------------------------------------------------------')
     print(' Validation set size:       {:.2f}'.format(VALIDATION_SET_SIZE))
     print(' Batch size:                {:d}'.format(BATCH_SIZE))
-    print(' Number of epochs:          {:d}'.format(NB_EPOCHS))
+    if nb_epochs is not None:
+        print(' Number of epochs:          {:d}'.format(nb_epochs))
+    if learning_rate is not None:
+        print(' Learning rate:             {:f}'.format(learning_rate))
     print('')
     print('Augmentation')
     print('----------------------------------------------------------')
@@ -75,9 +80,9 @@ def prepare_datasets(csv_filename, validation_set_proportion=0.0):
             samples.append(line)
 
     if validation_set_proportion == 0:
-        return samples
+        return shuffle(samples)
     else:
-        train_samples, validation_samples = train_test_split(samples, test_size=validation_set_proportion)
+        train_samples, validation_samples = train_test_split(shuffle(samples), test_size=validation_set_proportion)
 
         return train_samples, validation_samples
 
@@ -98,7 +103,7 @@ def plot_training_statistics(history):
     plt.show()
 
 
-def train_model(model, dataset_csv_filename, trained_model=None):
+def train_model(model, dataset_csv_filename, trained_model=None, nb_epochs=7, learning_rate=0.001):
     """ Initializes and trains the selected network.
 
     :param model:           Supported models are
@@ -107,6 +112,8 @@ def train_model(model, dataset_csv_filename, trained_model=None):
                              - VGG16
     :param dataset_csv_filename:  Path to dataset csv filename.
     :param trained_model:   Trained model file (*.h5). If set, the model will be retrained by the given dataset.
+    :param nb_epochs:       Number training epochs. Default = 7
+    :param learning_rate:   The optimizer's learning rate. Default = 0.001
     """
 
     supported_models = ['LeNet5', 'NvidiaCNN', 'VGG16']
@@ -127,7 +134,6 @@ def train_model(model, dataset_csv_filename, trained_model=None):
     print('Number of validation samples: {:5d}'.format(len(validation_samples)))
 
     global BATCH_SIZE
-    global NB_EPOCHS
 
     if model == 'LeNet5':
         # setup LeNet-5 model architecture
@@ -141,7 +147,6 @@ def train_model(model, dataset_csv_filename, trained_model=None):
                             crop_top=CROP_IMAGE_TOP, crop_bottom=CROP_IMAGE_BOTTOM,
                             steering_angle_correction=STEERING_ANGLE_CORRECTION,
                             weights_path=trained_model)
-        NB_EPOCHS = 7
     elif model == 'VGG16':
         # setup VGG-16 model architecture
         network = VGG(input_depth=3, input_height=160, input_width=320, regression=True, nb_classes=1,
@@ -151,12 +156,11 @@ def train_model(model, dataset_csv_filename, trained_model=None):
 
         # reduced batch size due to memory limitation on AWS and optimized number of epochs
         BATCH_SIZE = 16
-        NB_EPOCHS = 4
     else:
         print('Not support model. Check help for supported models.')
         exit(-1)
 
-    show_configuration(dataset_csv_filename)
+    show_configuration(dataset_csv_filename, learning_rate=learning_rate, nb_epochs=nb_epochs)
     print('{:s} Network Summary'.format(network.model_name))
     network.summary()
 
@@ -169,7 +173,7 @@ def train_model(model, dataset_csv_filename, trained_model=None):
     else:
         print('Retrain model \'{:s}\':'.format(trained_model))
 
-    network.train(NB_EPOCHS)
+    network.train(nb_epochs, learning_rate)
 
     # save the training results
     network.save_history(model + '_history.obj')
@@ -198,6 +202,20 @@ if __name__ == "__main__":
         help='Path to dataset CSV file.',
         dest='dataset_filename',
         metavar='CSV_FILE'
+    )
+
+    parser.add_argument(
+        '-ne', '--number-epochs',
+        help='Number of training epochs (default = 7).',
+        dest='number_epochs',
+        metavar='EPOCHS'
+    )
+
+    parser.add_argument(
+        '-lr', '--learning-rate',
+        help='Learning rate of the optimizer (default = 0.001).',
+        dest='learning_rate',
+        metavar='RATE'
     )
 
     parser.add_argument(
@@ -231,12 +249,29 @@ if __name__ == "__main__":
     if args.train_model:
         # train the model
         if args.dataset_filename is None:
-            print('Use -d CSV_FILE parameter to specify the training/validation dataset.')
+            print('ERROR: Use -d CSV_FILE parameter to specify the training/validation dataset.')
         elif os.path.exists(args.dataset_filename):
-            if args.retrain_model:
-                train_model(args.train_model, args.dataset_filename, args.retrain_model)
+            if args.learning_rate is None:
+                lr = 0.001
+                print('Using default learning rate {:f}'.format(lr))
             else:
-                train_model(args.train_model, args.dataset_filename)
+                lr = float(args.learning_rate)
+
+            if args.number_epochs is None:
+                print('ERROR: Use -ne parameter to specify the number training epochs.')
+                exit(-1)
+
+            if args.retrain_model:
+                train_model(model=args.train_model,
+                            dataset_csv_filename=args.dataset_filename,
+                            trained_model=args.retrain_model,
+                            nb_epochs=int(args.number_epochs),
+                            learning_rate=lr)
+            else:
+                train_model(model=args.train_model,
+                            dataset_csv_filename=args.dataset_filename,
+                            nb_epochs=int(args.number_epochs),
+                            learning_rate=lr)
         else:
             print('Dataset CSV file \'{:s}\' not found.'.format(args.dataset_filename))
 

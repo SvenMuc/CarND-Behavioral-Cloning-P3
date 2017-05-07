@@ -2,6 +2,7 @@ import pickle
 import cv2
 import numpy as np
 from sklearn.utils import shuffle
+from keras.optimizers import adam
 # TODO: from keras.utils.visualize_util import plot
 
 class BaseNetwork:
@@ -55,6 +56,18 @@ class BaseNetwork:
         self.steering_angle_correction = steering_angle_correction / 25.    # normalize angle from -25°..25° to -1..1
         self.weights_path = weights_path
 
+    @staticmethod
+    def preprocess_image(image):
+        """ Pre-processing pipeline for model input image. The method applies the following steps:
+        
+            - conversion from BGR to RGB
+        
+        :param image: Image which to be preprocessed (Input format: BGR coded image).
+        :return: Returns the pre-processed image.
+        """
+
+        return cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
     def generator(self, samples, batch_size=128):
         """ Generator
          
@@ -64,7 +77,8 @@ class BaseNetwork:
         :return: Returns x_train and y_train.
         """
 
-        nb_samples = len(samples)
+        # correct number of samples by additional left and right images
+        nb_samples = len(samples) * 3
 
         while 1:  # loop forever so the generator never terminates
             shuffle(samples)
@@ -121,21 +135,24 @@ class BaseNetwork:
         self.train_generator = self.generator(self.train_samples, batch_size=self.batch_size)
         self.validation_generator = self.generator(self.validation_samples, batch_size=self.batch_size)
 
-    def train(self, nb_epochs, verbose=1):
+    def train(self, nb_epochs, learning_rate=0.001, verbose=1):
         """
         Trains the network with given number of epochs.
         
-        :param nb_epochs: Number of epochs the model will be trained.
-        :param verbose:   0 = no logging, 1 = progress bar, 2 = one log line per epoch, Default = 1
+        :param nb_epochs:     Number of epochs the model will be trained.
+        :param learning_rate: Learning rate. Default = 0.001
+        :param verbose:       0 = no logging, 1 = progress bar, 2 = one log line per epoch, Default = 1
         
-        :return: Returns the training history data ['loss', 'val_loss'].
+        :return: Returns the training history ['loss', 'val_loss'].
         """
-        self.model.compile(optimizer='adam', loss='mse')
-        self.history_object = self.model.fit_generator(self.train_generator, samples_per_epoch=len(self.train_samples),
+        optimizer = adam(lr=learning_rate)
+        self.model.compile(optimizer=optimizer, loss='mse')
+        self.history_object = self.model.fit_generator(self.train_generator,
+                                                       samples_per_epoch=len(self.train_samples),
                                                        validation_data=self.validation_generator,
                                                        nb_val_samples=len(self.validation_samples),
-                                                       nb_epoch=nb_epochs, verbose=verbose)
-
+                                                       nb_epoch=nb_epochs,
+                                                       verbose=verbose)
         return self.history_object.history
 
     def save_history(self, filename='history.obj'):
