@@ -23,6 +23,7 @@ CROP_IMAGE_BOTTOM = 20      # number of pixels the image shall be cropped at bot
 
 # augmentation
 STEERING_ANGLE_CORRECTION = 6.25  # Steering angle correction for left and right images in degree
+SKIP_RATE_ZERO_ANGLES = 0.75      # Reduces zero angles data sets by skip rate [0..1]
 
 
 def show_configuration(dataset_csv_filename, nb_epochs=None, learning_rate=None):
@@ -134,24 +135,28 @@ def train_model(model, dataset_csv_filename, trained_model=None, nb_epochs=7, le
     print('Number of validation samples: {:5d}'.format(len(validation_samples)))
 
     global BATCH_SIZE
+    roi = [20, 60, 320 - 20, 160 - 22]
 
     if model == 'LeNet5':
         # setup LeNet-5 model architecture
-        network = LeNet(input_depth=3, input_height=160, input_width=320, regression=True, nb_classes=1,
-                        crop_top=CROP_IMAGE_TOP, crop_bottom=CROP_IMAGE_BOTTOM,
+        network = LeNet(input_depth=3, input_height=64, input_width=64, regression=True, nb_classes=1,
+                        roi=roi,
                         steering_angle_correction=STEERING_ANGLE_CORRECTION,
+                        skip_rate_zero_angles=SKIP_RATE_ZERO_ANGLES,
                         weights_path=trained_model)
     elif model == 'NvidiaCNN':
         # setup NVIDIA CNN model architecture
-        network = NvidiaCNN(input_depth=3, input_height=160, input_width=320, regression=True, nb_classes=1,
-                            crop_top=CROP_IMAGE_TOP, crop_bottom=CROP_IMAGE_BOTTOM,
+        network = NvidiaCNN(input_depth=3, input_height=64, input_width=64, regression=True, nb_classes=1,
+                            roi=roi,
                             steering_angle_correction=STEERING_ANGLE_CORRECTION,
+                            skip_rate_zero_angles=SKIP_RATE_ZERO_ANGLES,
                             weights_path=trained_model)
     elif model == 'VGG16':
         # setup VGG-16 model architecture
-        network = VGG(input_depth=3, input_height=160, input_width=320, regression=True, nb_classes=1,
-                      crop_top=CROP_IMAGE_TOP, crop_bottom=CROP_IMAGE_BOTTOM,
+        network = VGG(input_depth=3, input_height=64, input_width=64, regression=True, nb_classes=1,
+                      roi=roi,
                       steering_angle_correction=STEERING_ANGLE_CORRECTION,
+                      skip_rate_zero_angles=SKIP_RATE_ZERO_ANGLES,
                       weights_path=trained_model)
 
         # reduced batch size due to memory limitation on AWS and optimized number of epochs
@@ -163,6 +168,7 @@ def train_model(model, dataset_csv_filename, trained_model=None, nb_epochs=7, le
     show_configuration(dataset_csv_filename, learning_rate=learning_rate, nb_epochs=nb_epochs)
     print('{:s} Network Summary'.format(network.model_name))
     network.summary()
+    #network.verbose = 1
 
     # setup training and validation generators
     network.setup_training_validation_generators(train_samples, validation_samples, CFG_DATASET_PATH, BATCH_SIZE)

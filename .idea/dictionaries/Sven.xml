@@ -11,6 +11,7 @@
       <w>nvidia</w>
       <w>odometry</w>
       <w>relu</w>
+      <w>resized</w>
       <w>softmax</w>
     </words>
   </dictionary>

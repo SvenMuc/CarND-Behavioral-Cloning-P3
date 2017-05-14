@@ -13,7 +13,7 @@ class VGG(BaseNetwork):
     """ VGG-16 (16 layers) network which can be used either for a classification or regression problem."""
 
     def __init__(self, input_width, input_height, input_depth, nb_classes, regression=False,
-                 crop_top=0, crop_bottom=0, steering_angle_correction=0.0, weights_path=None):
+                 roi=None, steering_angle_correction=0.0, skip_rate_zero_angles=0.0, angle_threshold=0.0, weights_path=None):
         """ Constructs the VGG-16 network architecture.
         
         :param input_width:   Width of the input image.
@@ -23,14 +23,16 @@ class VGG(BaseNetwork):
                               number of regression outputs.
         :param regression:    If true the output layer is configured for a regression problem. If false the output
                               is configured with a softmax function.
-        :param crop_top:      If >0 the image will be cropped from top row by given number of pixels.
-        :param crop_bottom:   If >0 the image will be cropped from bottom by given number of pixels.
+        :param roi:           Region of interest which will be cropped [x0, y0, x1, y1].
         :param steering_angle_correction: Correction for left and right image steering angles in degree.
+        :param skip_rate_zero_angles: Reduces total amount of samples with 0° steering angle by given percentage. 
+                                      (0.0 = no reduction, 1.0 = remove all)
+        :param angle_threshold: Take left, right and flip images with |steering angle| >= threshold [0°..25°].
         :param weights_path:  Path to trained model parameters. If set, the model will be initialized by these parameters.
         """
 
         super(VGG, self).__init__('VGG-16', input_width, input_height, input_depth, nb_classes, regression,
-                                  crop_top, crop_bottom, steering_angle_correction, weights_path)
+                                  roi, steering_angle_correction, skip_rate_zero_angles, angle_threshold, weights_path)
 
         print('VGG-16 Configuration:')
         print(' Input Layer: w={:d}, h={:d}, d={:d}'.format(self.input_width, self.input_height, self.input_depth))
