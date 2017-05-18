@@ -6,24 +6,24 @@ import matplotlib.pyplot as plt
 import os
 from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
-from data_augmentation import visualize_data_set
 from networks.LeNet import LeNet
-from networks.NvidiaCNN import NvidiaCNN
+from networks.NvidiaFull import NvidiaFull
+from networks.NvidiaLight import NvidiaLight
 from networks.VGG import VGG
 
 
 # general setup
-CFG_DATASET_PATH = './data' # Path to dataset
+CFG_DATASET_PATH = './data'          # Path to dataset
 
 # hyperparameters
-VALIDATION_SET_SIZE = 0.2   # proportion of full dataset used for the test set
-BATCH_SIZE = 128            # default training batch size (number of images per batch)
-CROP_IMAGE_TOP = 60         # number of pixels the image shall be cropped at top row
-CROP_IMAGE_BOTTOM = 20      # number of pixels the image shall be cropped at bottom row
+VALIDATION_SET_SIZE = 0.2            # proportion of full dataset used for the test set
+BATCH_SIZE = 256                     # default training batch size (number of images per batch)
+ROI = [20, 60, 320 - 20, 160 - 22]   # Region if interest
+IMAGE_WIDTH = 100                    # Model input image width
+IMAGE_HEIGHT = 100                   # Model input image height
 
 # augmentation
-STEERING_ANGLE_CORRECTION = 6.25  # Steering angle correction for left and right images in degree
-SKIP_RATE_ZERO_ANGLES = 0.75      # Reduces zero angles data sets by skip rate [0..1]
+STEERING_ANGLE_CORRECTION = 6.25     # Steering angle correction for left and right images in degree
 
 
 def show_configuration(dataset_csv_filename, nb_epochs=None, learning_rate=None):
@@ -41,8 +41,9 @@ def show_configuration(dataset_csv_filename, nb_epochs=None, learning_rate=None)
     print('')
     print('Data pre-processing')
     print('----------------------------------------------------------')
-    print(' Crop image at top:         {:d} pixels'.format(CROP_IMAGE_TOP))
-    print(' Crop image at bottom:      {:d} pixels'.format(CROP_IMAGE_BOTTOM))
+    print(' ROI:                       [{:d}, {:d}, {:d}, {:d}] pixels'.format(ROI[0], ROI[1], ROI[2], ROI[3]))
+    print(' Image width:               {:d}'.format(IMAGE_WIDTH))
+    print(' Image height:              {:d}'.format(IMAGE_HEIGHT))
     print('')
     print('Hyperparameters')
     print('----------------------------------------------------------')
@@ -104,20 +105,22 @@ def plot_training_statistics(history):
     plt.show()
 
 
-def train_model(model, dataset_csv_filename, trained_model=None, nb_epochs=7, learning_rate=0.001):
+def train_model(model, dataset_csv_filename, trained_model=None, nb_epochs=7, nb_samples_per_epoch=20.000, learning_rate=0.001):
     """ Initializes and trains the selected network.
 
     :param model:           Supported models are
                              - LeNet5
-                             - NvidiaCNN
+                             - NvidiaFull
+                             - NvidiaLight (lightweight NVIDIA architecture)
                              - VGG16
     :param dataset_csv_filename:  Path to dataset csv filename.
-    :param trained_model:   Trained model file (*.h5). If set, the model will be retrained by the given dataset.
-    :param nb_epochs:       Number training epochs. Default = 7
-    :param learning_rate:   The optimizer's learning rate. Default = 0.001
+    :param trained_model:         Trained model file (*.h5). If set, the model will be retrained by the given dataset.
+    :param nb_epochs:             Number training epochs. Default = 7
+    :param nb_samples_per_epoch:  Number of samples which will be train in each epoch. Default = 20.000
+    :param learning_rate:         The optimizer's learning rate. Default = 0.001
     """
 
-    supported_models = ['LeNet5', 'NvidiaCNN', 'VGG16']
+    supported_models = ['LeNet5', 'NvidiaFull', 'NvidiaLight', 'VGG16']
 
     # check for valid model
     matching = [s for s in supported_models if model in s]
@@ -135,28 +138,34 @@ def train_model(model, dataset_csv_filename, trained_model=None, nb_epochs=7, le
     print('Number of validation samples: {:5d}'.format(len(validation_samples)))
 
     global BATCH_SIZE
-    roi = [20, 60, 320 - 20, 160 - 22]
 
     if model == 'LeNet5':
         # setup LeNet-5 model architecture
-        network = LeNet(input_depth=3, input_height=64, input_width=64, regression=True, nb_classes=1,
-                        roi=roi,
+        network = LeNet(input_depth=3, input_height=IMAGE_HEIGHT, input_width=IMAGE_WIDTH,
+                        regression=True, nb_classes=1,
+                        roi=ROI,
                         steering_angle_correction=STEERING_ANGLE_CORRECTION,
-                        skip_rate_zero_angles=SKIP_RATE_ZERO_ANGLES,
                         weights_path=trained_model)
-    elif model == 'NvidiaCNN':
-        # setup NVIDIA CNN model architecture
-        network = NvidiaCNN(input_depth=3, input_height=64, input_width=64, regression=True, nb_classes=1,
-                            roi=roi,
-                            steering_angle_correction=STEERING_ANGLE_CORRECTION,
-                            skip_rate_zero_angles=SKIP_RATE_ZERO_ANGLES,
-                            weights_path=trained_model)
+    elif model == 'NvidiaFull':
+        # setup Full NVIDIA CNN model architecture
+        network = NvidiaFull(input_depth=3, input_height=IMAGE_HEIGHT, input_width=IMAGE_WIDTH,
+                             regression=True, nb_classes=1,
+                             roi=ROI,
+                             steering_angle_correction=STEERING_ANGLE_CORRECTION,
+                             weights_path=trained_model)
+    elif model == 'NvidiaLight':
+        # setup lightweight NVIDIA CNN model architecture
+        network = NvidiaLight(input_depth=3, input_height=IMAGE_HEIGHT, input_width=IMAGE_WIDTH,
+                              regression=True, nb_classes=1,
+                              roi=ROI,
+                              steering_angle_correction=STEERING_ANGLE_CORRECTION,
+                              weights_path=trained_model)
     elif model == 'VGG16':
         # setup VGG-16 model architecture
-        network = VGG(input_depth=3, input_height=64, input_width=64, regression=True, nb_classes=1,
-                      roi=roi,
+        network = VGG(input_depth=3, input_height=IMAGE_HEIGHT, input_width=IMAGE_WIDTH,
+                      regression=True, nb_classes=1,
+                      roi=ROI,
                       steering_angle_correction=STEERING_ANGLE_CORRECTION,
-                      skip_rate_zero_angles=SKIP_RATE_ZERO_ANGLES,
                       weights_path=trained_model)
 
         # reduced batch size due to memory limitation on AWS and optimized number of epochs
@@ -168,7 +177,7 @@ def train_model(model, dataset_csv_filename, trained_model=None, nb_epochs=7, le
     show_configuration(dataset_csv_filename, learning_rate=learning_rate, nb_epochs=nb_epochs)
     print('{:s} Network Summary'.format(network.model_name))
     network.summary()
-    #network.verbose = 1
+    # network.verbose = 1
 
     # setup training and validation generators
     network.setup_training_validation_generators(train_samples, validation_samples, CFG_DATASET_PATH, BATCH_SIZE)
@@ -179,7 +188,7 @@ def train_model(model, dataset_csv_filename, trained_model=None, nb_epochs=7, le
     else:
         print('Retrain model \'{:s}\':'.format(trained_model))
 
-    network.train(nb_epochs, learning_rate)
+    network.train(nb_epochs=nb_epochs, nb_samples_per_epoch=nb_samples_per_epoch, learning_rate=learning_rate)
 
     # save the training results
     network.save_history(model + '_history.obj')
@@ -191,7 +200,7 @@ if __name__ == "__main__":
 
     parser.add_argument(
         '-t', '--train',
-        help='Trains the model. Supported MODELS=\'LeNet5\', \'NvidiaCNN\', \'VGG16\'.',
+        help='Trains the model. Supported MODELS=\'LeNet5\', \'NvidiaFull\', \'NvidiaLight\', \'VGG16\'.',
         dest='train_model',
         metavar='MODEL'
     )
@@ -218,17 +227,17 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
+        '-ns', '--number-samples_per_epoch',
+        help='Number samples trained each epoch (default = 20.000).',
+        dest='number_samples_epoch',
+        metavar='SAMPLES'
+    )
+
+    parser.add_argument(
         '-lr', '--learning-rate',
         help='Learning rate of the optimizer (default = 0.001).',
         dest='learning_rate',
         metavar='RATE'
-    )
-
-    parser.add_argument(
-        '-vd', '--visualize-datasets',
-        help='Visualizes random dataset samples.',
-        dest='visualize_dataset_csv',
-        metavar='CSV_FILE'
     )
 
     parser.add_argument(
@@ -267,28 +276,25 @@ if __name__ == "__main__":
                 print('ERROR: Use -ne parameter to specify the number training epochs.')
                 exit(-1)
 
+            if args.number_samples_epoch is None:
+                print('ERROR: Use -ns parameter to specify the number samples per epoch.')
+                exit(-1)
+
             if args.retrain_model:
                 train_model(model=args.train_model,
                             dataset_csv_filename=args.dataset_filename,
                             trained_model=args.retrain_model,
                             nb_epochs=int(args.number_epochs),
+                            nb_samples_per_epoch=int(args.number_samples_epoch),
                             learning_rate=lr)
             else:
                 train_model(model=args.train_model,
                             dataset_csv_filename=args.dataset_filename,
                             nb_epochs=int(args.number_epochs),
+                            nb_samples_per_epoch=int(args.number_samples_epoch),
                             learning_rate=lr)
         else:
             print('Dataset CSV file \'{:s}\' not found.'.format(args.dataset_filename))
-
-    elif args.visualize_dataset_csv:
-        # Prepare data sets and show random training and validation sample
-        print('Preparing training and validation datasets...', end='', flush=True)
-        samples = prepare_datasets(args.visualize_dataset_csv, 0.0)
-        print('done')
-
-        print('Show random dataset samples:')
-        visualize_data_set(samples, title='Dataset', dataset_path=CFG_DATASET_PATH)
 
     elif args.history_filename:
         # unpickle history object and plot training and validation loss

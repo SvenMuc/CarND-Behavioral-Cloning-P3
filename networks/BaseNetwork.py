@@ -4,6 +4,7 @@ import numpy as np
 from sklearn.utils import shuffle
 import DataAugmentation as da
 from keras.optimizers import adam
+from keras.callbacks import ModelCheckpoint, EarlyStopping
 # TODO: from keras.utils.visualize_util import plot
 
 class BaseNetwork:
@@ -16,7 +17,6 @@ class BaseNetwork:
     nb_classes = 1                   # Number of output classes resp. number of regression values
     regression = False               # If true, the network is setup as regression problem. Otherwise for classification
     steering_angle_correction = 0.0  # Correction of steering angles for left and right images
-    skip_rate_zero_angles = 0.0      # Reduces zero angles data sets by skip rate [0..1]
     angle_threshold = 0.0            # Take left, right and flip images with |steering angle| >= threshold [0°..25°]
     weights_path = ''                # Path to trained model weights
     model = None                     # Keras model
@@ -25,16 +25,16 @@ class BaseNetwork:
     validation_generator = None      # Generator for validation data
     train_samples = None             # Training dataset (links to images only!)
     validation_samples = None        # Validation dataset (links to images only!)
+    nb_samples_per_epoch = 0         # Number of sample trained per epoch
     nb_train_samples = 0             # Total number if training samples after augmentation (produced by generator)
     nb_validation_samples = 0        # Total number if validation samples after augmentation (produced by generator)
     path_to_image_data = ''          # Path to image data (replaces the path in the train/valid samples)
     history_object = None            # History object contains the loss and val_loss data after network training
     roi = None                       # Region of interesst which will be cropped before feeded into the first model layer
-    verbose = 0                      # If >0 verbose mode (prints internal debug information)
-
+    verbose = 0                      # 1 = verbose mode (prints internal debug information), 2 = show generator images
 
     def __init__(self, model_name, input_width, input_height, input_depth, nb_classes, regression=False,
-                 roi=None, steering_angle_correction=0.0, skip_rate_zero_angles=0.0, angle_threshold=0.0, weights_path=None):
+                 roi=None, steering_angle_correction=0.0, angle_threshold=0.0, weights_path=None):
         """ Initializes the base network.
         
         :param model_name:    Name of the model (e.g NvidiaCNN, LeNet5, etc).
@@ -47,9 +47,7 @@ class BaseNetwork:
                               is configured with a softmax function.
         :param roi:           Region of interest which will be cropped [x0, y0, x1, y1].
         :param steering_angle_correction: Correction for left and right image steering angles in degree.
-        :param skip_rate_zero_angles: Reduces total amount of samples with 0° steering angle by given percentage. 
-                                      (0.0 = no reduction, 1.0 = remove all)
-        :param angle_threshold: Take left, right and flipe images with |steering angle| >= threshold [0°..25°].
+        :param angle_threshold: Take left, right and flip images with |steering angle| >= threshold [0°..25°].
         :param weights_path:  Path to trained model parameters. If set, the model will be initialized by these parameters.
         """
 
@@ -61,15 +59,16 @@ class BaseNetwork:
         self.regression = regression
         self.roi = roi
         self.steering_angle_correction = steering_angle_correction / 25.    # normalize angle from -25°..25° to -1..1
-        self.skip_rate_zero_angles = skip_rate_zero_angles
         self.angle_threshold = angle_threshold / 25.                        # normalize angle from -25°..25° to -1..1
         self.weights_path = weights_path
 
     @staticmethod
     def preprocess_image(image, width, height, roi):
         """ Pre-processing pipeline for model input image. The method applies the following steps:
+
+            - crop and resize image
                 
-        :param image:  Image which to be preprocessed (Input format: RGB coded image).
+        :param image:  Image which shall be preprocessed (Input format: RGB coded image!).
         :param width:  Width of the model input image. If smaller than original image, the image will be resized.
         :param height: Height of the model input image. If smaller than original image, the image will be resized.
         :param roi:    Region of interest which will be cropped [x0, y0, x1, y1].
@@ -77,119 +76,99 @@ class BaseNetwork:
         :return: Returns the pre-processed image.
         """
 
+        # TODO: image_hsv = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
         return da.DataAugmentation.crop_image(image, roi, (width, height))
 
-    def get_number_genertor_samples(self, samples, reduce_zero_angles=True):
-        """ Determines the total number of samples the generator produces.
-        
-        ATTENTION: 
-        Make sure the 'skip_rate_zero_angles' and 'angle_threshold' is set correctly. 
-        
-        :param samples:             Training or validation samples.
-        :param reduce_zero_angles: If true, zereo angles will be reduced before counting.
-        
-        :return: Returns the total number of samples the generator produces base on its input samples.
-        """
-
-        if reduce_zero_angles:
-            samples_reduced = da.DataAugmentation.reduce_zero_steering_angles(samples, self.skip_rate_zero_angles)
-        else:
-            samples_reduced = samples
-
-        nb_angle_theshold = 0
-        for sample in samples_reduced:
-            if abs(float(sample[3])) >= self.angle_threshold:
-                nb_angle_theshold += 1
-
-        return len(samples_reduced) * 2 + (nb_angle_theshold * 5)
-
-    def generator(self, samples, batch_size=128):
+    def generator(self, samples, batch_size=128, augment=True):
         """ Generator
          
         :param samples:    Samples which shall be loaded into memory. 
         :param batch_size: Batch size for actual run.
+        :param augment:    If true the dataset will be randomly augmented.
         
         :return: Returns x_train and y_train.
         """
 
-        # reduce total amount of scenes with 0° steering angles in order to avoid bias towards straights
-        samples_reduced = da.DataAugmentation.reduce_zero_steering_angles(samples, self.skip_rate_zero_angles)
-        shuffle(samples_reduced)
+        samples = shuffle(samples)
 
-        nb_samples = len(samples_reduced)
-        nb_gen_samples = self.get_number_genertor_samples(samples_reduced, reduce_zero_angles=False)
+        nb_samples = len(samples)
         nb_total_samples = 0
+        color_scheme = cv2.COLOR_BGR2RGB
 
         while 1:  # loop forever so the generator never terminates
             for offset in range(0, nb_samples, batch_size):
-                batch_samples = samples_reduced[offset:offset + batch_size]
+                batch_samples = samples[offset:offset + batch_size]
 
                 nb_batch_samples = 0
                 images = []
                 angles = []
                 crop_size = (self.input_width, self.input_height)
+                i = 0
 
                 for batch_sample in batch_samples:
-                    center_angle = float(batch_sample[3])
+                    angle_center = float(batch_sample[3])
 
-                    # cv2.imread returns BGR images, convert to RGB because simulator delivers RGB images
-                    center_image = cv2.imread(self.path_to_image_data + '/' + batch_sample[0].lstrip())
-                    center_image = cv2.cvtColor(center_image, cv2.COLOR_BGR2RGB)
-                    images.append(da.DataAugmentation.crop_image(center_image, self.roi, crop_size))
-                    angles.append(center_angle)
-                    nb_batch_samples += 1
+                    # add 60% augmented images and 40% recorded images
+                    if augment and np.random.rand() <= 0.6:
+                        # add random center, left or right image
+                        clr = np.random.randint(low=0, high=3)
 
-                    # take left and right images with |center steering angle| >= threshold only
-                    if abs(center_angle) >= self.angle_threshold:
-                        # add left and right image
-                        left_image = cv2.imread(self.path_to_image_data + '/' + batch_sample[1].lstrip())
-                        left_image = cv2.cvtColor(left_image, cv2.COLOR_BGR2RGB)
-                        images.append(da.DataAugmentation.crop_image(left_image, self.roi, crop_size))
-                        left_angle = center_angle + self.steering_angle_correction
-                        angles.append(left_angle)
-                        nb_batch_samples += 1
+                        if clr == 0:
+                            # add center image
+                            image = cv2.imread(self.path_to_image_data + '/' + batch_sample[0].lstrip())
+                            image = cv2.cvtColor(image, color_scheme)
+                            angle = angle_center
+                        elif clr == 1:
+                            # add left image
+                            image = cv2.imread(self.path_to_image_data + '/' + batch_sample[1].lstrip())
+                            image = cv2.cvtColor(image, color_scheme)
+                            angle = angle_center + self.steering_angle_correction
+                        elif clr == 2:
+                            # add right image
+                            image = cv2.imread(self.path_to_image_data + '/' + batch_sample[2].lstrip())
+                            image = cv2.cvtColor(image, color_scheme)
+                            angle = angle_center - self.steering_angle_correction
 
-                        right_image = cv2.imread(self.path_to_image_data + '/' + batch_sample[2].lstrip())
-                        right_image = cv2.cvtColor(right_image, cv2.COLOR_BGR2RGB)
-                        images.append(da.DataAugmentation.crop_image(right_image, self.roi, crop_size))
-                        right_angle = center_angle - self.steering_angle_correction
-                        angles.append(right_angle)
-                        nb_batch_samples += 1
+                        # apply random translation
+                        # TODO: image, angle = da.DataAugmentation.random_translation(image, angle, [30, 30], probability=0.5)
 
-                        # flip center, left and right image
-                        flipped_image, flipped_angle = da.DataAugmentation.flip_image_horizontally(center_image, center_angle)
-                        images.append(da.DataAugmentation.crop_image(flipped_image, self.roi, crop_size))
-                        angles.append(flipped_angle)
-                        nb_batch_samples += 1
+                        # apply random perspective transformation
+                        image, angle = da.DataAugmentation.random_perspective_transformation(image, angle, [40, 50], probability=0.5)
 
-                        flipped_image, flipped_angle = da.DataAugmentation.flip_image_horizontally(left_image, left_angle)
-                        images.append(da.DataAugmentation.crop_image(flipped_image, self.roi, crop_size))
-                        angles.append(flipped_angle)
-                        nb_batch_samples += 1
+                        # apply shadow augmentation
+                        # TODO: image = da.DataAugmentation.random_shadow(image, probability=0.5)
 
-                        flipped_image, flipped_angle = da.DataAugmentation.flip_image_horizontally(right_image, right_angle)
-                        images.append(da.DataAugmentation.crop_image(flipped_image, self.roi, crop_size))
-                        angles.append(flipped_angle)
-                        nb_batch_samples += 1
+                        # crop and resize image
+                        image = da.DataAugmentation.crop_image(image, self.roi, crop_size)
 
-                    # add randomly translated, rotated and perspective transformed center images
-                    augmentation = np.random.randint(low=0, high=1)
+                        # apply random flip, lr_bias = 0.0 (no left/right bias correction of dataset)
+                        image, angle = da.DataAugmentation.flip_image_horizontally(image, angle, probability=0.5, lr_bias=0.0)
 
-                    if augmentation == 0:
-                        new_center_image, new_center_angle = da.DataAugmentation.augment_translation(center_image, center_angle, [20, 20])
-                    elif augmentation == 1:
-                        new_center_image, new_center_angle = da.DataAugmentation.augment_rotation(center_image, center_angle, 10.)
+                        # apply random brightness
+                        # TODO: image = da.DataAugmentation.random_brightness(image, probability=0.5)
                     else:
-                        new_center_image, new_center_angle = da.DataAugmentation.augment_perpective_transformation(center_image, center_angle, [40, 50])
+                        # add center image
+                        image = cv2.imread(self.path_to_image_data + '/' + batch_sample[0].lstrip())
+                        image = cv2.cvtColor(image, color_scheme)
+                        image = da.DataAugmentation.crop_image(image, self.roi, crop_size)
+                        angle = angle_center
 
-                    images.append(da.DataAugmentation.crop_image(new_center_image, self.roi, crop_size))
-                    angles.append(new_center_angle)
+                    images.append(image)
+                    angles.append(angle)
                     nb_batch_samples += 1
+                    i += 1
+
+                    if self.verbose == 2:
+                        # show generated images in a separate window
+                        image_gen = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+                        da.DataAugmentation.draw_steering_angles(image_gen, steering_angle=angle)
+                        cv2.imshow('Generator output', image_gen)
+                        cv2.waitKey(100)
 
                 nb_total_samples += nb_batch_samples
 
                 if self.verbose > 0:
-                    print(' Generator: nb_samples: {:d} nb_batch_samples: {:d} nb_total_samples: {:d}/{:d}'.format(nb_samples, nb_batch_samples, nb_total_samples, nb_gen_samples))
+                    print(' Generator: nb_batch_samples: {:4d} nb_total_samples: {:5d}/{:5d}'.format(nb_batch_samples, nb_total_samples, nb_samples))
 
                 # convert to numpy arrays
                 x_train = np.array(images)
@@ -210,30 +189,38 @@ class BaseNetwork:
         self.batch_size = batch_size
         self.path_to_image_data = path_to_image_data
 
-        self.nb_train_samples = self.get_number_genertor_samples(train_samples)
-        self.nb_validation_samples = self.get_number_genertor_samples(validation_samples)
+        self.nb_train_samples = len(train_samples)
+        self.nb_validation_samples = len(validation_samples)
 
-        self.train_generator = self.generator(self.train_samples, batch_size=self.batch_size)
-        self.validation_generator = self.generator(self.validation_samples, batch_size=self.batch_size)
+        self.train_generator = self.generator(self.train_samples, batch_size=self.batch_size, augment=True)
+        self.validation_generator = self.generator(self.validation_samples, batch_size=self.batch_size, augment=False)
 
-    def train(self, nb_epochs, learning_rate=0.001, verbose=1):
+    def train(self, nb_epochs, nb_samples_per_epoch, learning_rate=0.001, verbose=1):
         """
         Trains the network with given number of epochs.
         
-        :param nb_epochs:     Number of epochs the model will be trained.
-        :param learning_rate: Learning rate. Default = 0.001
-        :param verbose:       0 = no logging, 1 = progress bar, 2 = one log line per epoch, Default = 1
+        :param nb_epochs:            Number of epochs the model will be trained.
+        :param nb_samples_per_epoch: Number of samples which will be train in each epoch.
+        :param learning_rate:        Learning rate. Default = 0.001
+        :param verbose:              0 = no logging, 1 = progress bar, 2 = one log line per epoch, Default = 1
         
         :return: Returns the training history ['loss', 'val_loss'].
         """
+
+        filepath = self.model_name + '_checkpoint_{epoch:02d}_{val_loss:.4f}.h5'
+        checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=False, mode='max')
+        early_stopping = EarlyStopping(monitor='val_loss', patience=2, verbose=True)
+
         optimizer = adam(lr=learning_rate)
+        self.nb_samples_per_epoch = nb_samples_per_epoch
         self.model.compile(optimizer=optimizer, loss='mse')
         self.history_object = self.model.fit_generator(self.train_generator,
-                                                       samples_per_epoch=self.nb_train_samples,
+                                                       samples_per_epoch=nb_samples_per_epoch,
                                                        validation_data=self.validation_generator,
                                                        nb_val_samples=self.nb_validation_samples,
                                                        nb_epoch=nb_epochs,
-                                                       verbose=verbose)
+                                                       verbose=verbose,
+                                                       callbacks=[checkpoint, early_stopping])
         return self.history_object.history
 
     def save_history(self, filename='history.obj'):

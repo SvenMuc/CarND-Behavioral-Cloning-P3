@@ -16,6 +16,10 @@ from keras.models import load_model
 import h5py
 from keras import __version__ as keras_version
 from networks.BaseNetwork import BaseNetwork
+from Filter import Filter
+from model import IMAGE_WIDTH, IMAGE_HEIGHT, ROI
+from DataAugmentation import DataAugmentation
+
 sio = socketio.Server()
 app = Flask(__name__)
 model = None
@@ -44,9 +48,10 @@ class SimplePIController:
 
 
 controller = SimplePIController(0.1, 0.002)
-set_speed = 9
+set_speed = 15
 controller.set_desired(set_speed)
 
+# filter = Filter()
 
 @sio.on('telemetry')
 def telemetry(sid, data):
@@ -61,21 +66,24 @@ def telemetry(sid, data):
         imgString = data["image"]
         image = Image.open(BytesIO(base64.b64decode(imgString)))
         image_array = np.asarray(image)
-        width = image_array.shape[1]
-        height = image_array.shape[0]
-        roi = [20, 60, width - 20, height - 22]
-        input_image = BaseNetwork.preprocess_image(image_array, 64, 64, roi)
+
+        # Pre-process image and predict steering angle
+        input_image = BaseNetwork.preprocess_image(image_array, IMAGE_WIDTH, IMAGE_HEIGHT, ROI)
         steering_angle = float(model.predict(input_image[None, :, :, :], batch_size=1))
+
+        # filter steering angle by moving average
+        # steering_angle = filter.moving_average(steering_angle, window_size=8)
 
         throttle = controller.update(float(speed))
 
-        print(steering_angle, throttle)
+        print('angle: {:7.3f}° throttle: {:.4f} speed: {:5.2f} mph'.format(steering_angle * 25., throttle, float(speed)))
         send_control(steering_angle, throttle)
 
         # save frame
         if args.image_folder != '':
             timestamp = datetime.utcnow().strftime('%Y_%m_%d_%H_%M_%S_%f')[:-3]
             image_filename = os.path.join(args.image_folder, timestamp)
+            image = Image.fromarray(DataAugmentation.draw_steering_angles(image_array, steering_angle=steering_angle))
             image.save('{}.jpg'.format(image_filename))
     else:
         # NOTE: DON'T EDIT THIS.

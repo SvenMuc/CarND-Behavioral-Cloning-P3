@@ -1,6 +1,6 @@
 from networks.BaseNetwork import BaseNetwork
 from keras.models import Sequential
-from keras.layers import Lambda, Cropping2D
+from keras.layers import Lambda
 from keras.layers.convolutional import Convolution2D
 from keras.layers.convolutional import MaxPooling2D
 from keras.layers.core import Flatten
@@ -8,11 +8,11 @@ from keras.layers.core import Dense
 from keras.layers.core import Dropout
 
 
-class NvidiaCNN(BaseNetwork):
-    """ NVIDIA CNN network which can be used either for a classification or regression problem."""
+class NvidiaFull(BaseNetwork):
+    """ Full NVIDIA CNN network which can be used either for a classification or regression problem."""
 
     def __init__(self, input_width, input_height, input_depth, nb_classes, regression=False,
-                 roi=None, steering_angle_correction=0.0, skip_rate_zero_angles=0.0, angle_threshold=0.0, weights_path=None):
+                 roi=None, steering_angle_correction=0.0, angle_threshold=0.0, weights_path=None):
         """ Constructs the NVIDIA CNN network architecture.
         
         :param input_width:   Width of the input image.
@@ -24,16 +24,14 @@ class NvidiaCNN(BaseNetwork):
                               is configured with a softmax function.
         :param roi:           Region of interest which will be cropped [x0, y0, x1, y1].
         :param steering_angle_correction: Correction for left and right image steering angles in degree.
-        :param skip_rate_zero_angles: Reduces total amount of samples with 0° steering angle by given percentage. 
-                                      (0.0 = no reduction, 1.0 = remove all)
-        :param flip_angle_threshold: Take left, right and flip images with |steering angle| >= threshold [0°..25°].
+        :param angle_threshold: Take left, right and flip images with |steering angle| >= threshold [0°..25°].
         :param weights_path:  Path to trained model parameters. If set, the model will be initialized by these parameters.
         """
 
-        super(NvidiaCNN, self).__init__('NvidiaCNN', input_width, input_height, input_depth, nb_classes, regression,
-                                        roi, steering_angle_correction, skip_rate_zero_angles, angle_threshold, weights_path)
+        super(NvidiaFull, self).__init__('NvidiaFull', input_width, input_height, input_depth, nb_classes, regression,
+                                         roi, steering_angle_correction, angle_threshold, weights_path)
 
-        print('NVIDIA CNN Configuration:')
+        print('NVIDIA Full CNN Configuration:')
         print(' Input Layer: w={:d}, h={:d}, d={:d}'.format(self.input_width, self.input_height, self.input_depth))
         print(' Output Layer: {:d}, {:s}'.format(self.nb_classes, 'regression' if self.regression else 'softmax'))
 
@@ -52,10 +50,6 @@ class NvidiaCNN(BaseNetwork):
 
         # normalize and mean center images
         self.model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape=(self.input_height, self.input_width, self.input_depth)))
-
-        # TODO: crop images at top and bottom
-        #if self.crop_top > 0 or self.crop_bottom > 0:
-        #    self.model.add(Cropping2D(cropping=((self.crop_top, self.crop_bottom), (0, 0))))
 
         # CONV --> RELU --> POOL
         self.model.add(Convolution2D(3, 5, 5,  border_mode='same', activation='relu'))
