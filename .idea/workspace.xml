@@ -698,7 +698,14 @@
       <option name="project" value="LOCAL" />
       <updated>1495141180551</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Optimized network architectures and new generator to augment dataset on the fly. Added new data visualisation features to the toolbox.">
+      <created>1495141324830</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1495141324830</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TodoView">
