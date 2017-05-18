@@ -4,18 +4,11 @@
     <option name="SCOPE_TYPE" value="3" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ea67561f-5d58-4312-8e80-32ff379bba09" name="Default" comment="Optimized network architectures and new generator to augment dataset on the fly. Added new data visualisation features to the toolbox.">
-      <change type="MOVED" beforePath="$PROJECT_DIR$/data_augmentation.py" afterPath="$PROJECT_DIR$/toolbox.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/networks/NvidiaCNN.py" afterPath="$PROJECT_DIR$/networks/NvidiaFull.py" />
+    <list default="true" id="ea67561f-5d58-4312-8e80-32ff379bba09" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DataAugmentation.py" afterPath="$PROJECT_DIR$/DataAugmentation.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/drive.py" afterPath="$PROJECT_DIR$/drive.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/model.py" afterPath="$PROJECT_DIR$/model.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/networks/BaseNetwork.py" afterPath="$PROJECT_DIR$/networks/BaseNetwork.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/networks/LeNet.py" afterPath="$PROJECT_DIR$/networks/LeNet.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/networks/VGG.py" afterPath="$PROJECT_DIR$/networks/VGG.py" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
+    <ignored path="data_old/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -44,7 +37,7 @@
       <file leaf-file-name="toolbox.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/toolbox.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="183">
+            <state relative-caret-position="176">
               <caret line="254" column="50" lean-forward="false" selection-start-line="254" selection-start-column="50" selection-end-line="254" selection-end-column="50" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
@@ -698,7 +691,14 @@
       <option name="project" value="LOCAL" />
       <updated>1495140798531</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Optimized network architectures and new generator to augment dataset on the fly. Added new data visualisation features to the toolbox.">
+      <created>1495141180551</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1495141180551</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TodoView">
@@ -1114,7 +1114,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/toolbox.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="183">
+        <state relative-caret-position="176">
           <caret line="254" column="50" lean-forward="false" selection-start-line="254" selection-start-column="50" selection-end-line="254" selection-end-column="50" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
