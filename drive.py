@@ -3,6 +3,7 @@ import base64
 from datetime import datetime
 import os
 import shutil
+import sys
 
 import numpy as np
 import socketio
@@ -19,6 +20,8 @@ from networks.BaseNetwork import BaseNetwork
 from Filter import Filter
 from model import IMAGE_WIDTH, IMAGE_HEIGHT, ROI
 from DataAugmentation import DataAugmentation
+import cv2
+
 
 sio = socketio.Server()
 app = Flask(__name__)
@@ -48,20 +51,43 @@ class SimplePIController:
 
 
 controller = SimplePIController(0.1, 0.002)
-set_speed = 15
+set_speed = 9
 controller.set_desired(set_speed)
 
 # filter = Filter()
+
+
+def bar(value, range=[-1., 1.], prefix='', suffix=''):
+    """ Shows graph like this [-----|-----] in the console.
+
+    :param value:  Value which shall be shown.
+    :param range:  Range of graph.
+    :param prefix: Text shown before the graph.
+    :param suffix: Text shown behind the graph.
+    """
+
+    bar_len = 21
+    r = float(range[1] - range[0])
+    value_pos = max(min(int(bar_len * (value + r / 2.) / r), bar_len - 1), 0)
+
+    list = ['-'] * bar_len
+    list[int(bar_len / 2)] = '+'
+    list[value_pos] = '∆'
+
+    str = ''.join(list)
+    sys.stdout.write('{:s}[{:s}] {:s}'.format(prefix, str, suffix))
+    sys.stdout.flush()
+
 
 @sio.on('telemetry')
 def telemetry(sid, data):
     if data:
         # The current steering angle of the car
-        steering_angle = data["steering_angle"]
+        steering_angle = float(data["steering_angle"])
         # The current throttle of the car
-        throttle = data["throttle"]
+        throttle = float(data["throttle"])
         # The current speed of the car
-        speed = data["speed"]
+        speed = float(data["speed"])
         # The current image from the center camera of the car
         imgString = data["image"]
         image = Image.open(BytesIO(base64.b64decode(imgString)))
@@ -72,12 +98,30 @@ def telemetry(sid, data):
         steering_angle = float(model.predict(input_image[None, :, :, :], batch_size=1))
 
         # filter steering angle by moving average
-        # steering_angle = filter.moving_average(steering_angle, window_size=8)
+        # TODO: steering_angle = filter.moving_average(steering_angle, window_size=8)
 
-        throttle = controller.update(float(speed))
+        # adjust set speed depending on predicted steering angle
+        if np.abs(steering_angle) > 17. / 25.:
+            controller.set_desired(5)
+        elif np.abs(steering_angle) > 13 / 25.:
+            controller.set_desired(7)
+        elif np.abs(steering_angle) > 9. / 25.:
+            controller.set_desired(9)
+        else:
+            controller.set_desired(10)
 
-        print('angle: {:7.3f}° throttle: {:.4f} speed: {:5.2f} mph'.format(steering_angle * 25., throttle, float(speed)))
+        # emergency brake for driving downhill
+        if speed > (controller.set_point + 10):
+            throttle = 0.
+            print('<<< Emergency brake >>>')
+
+        throttle = controller.update(speed)
         send_control(steering_angle, throttle)
+
+        # show status
+        bar(steering_angle, prefix='angle: ', suffix=' {:7.2f}°'.format(steering_angle * 25.))
+        bar(throttle, prefix='  throttle: ', suffix=' {:5.2f}'.format(throttle))
+        print('  speed: {:5.2f} / {:5.2f} mph'.format(speed, controller.set_point))
 
         # save frame
         if args.image_folder != '':
@@ -85,6 +129,12 @@ def telemetry(sid, data):
             image_filename = os.path.join(args.image_folder, timestamp)
             image = Image.fromarray(DataAugmentation.draw_steering_angles(image_array, steering_angle=steering_angle))
             image.save('{}.jpg'.format(image_filename))
+
+            # show steering angle prediction in image
+            # image_array = cv2.cvtColor(image_array, cv2.COLOR_RGB2BGR)
+            # cv2.imshow('Predicted steering angle', image_array)
+            # cv2.waitKey(1)
+
     else:
         # NOTE: DON'T EDIT THIS.
         sio.emit('manual', data={}, skip_sid=True)
