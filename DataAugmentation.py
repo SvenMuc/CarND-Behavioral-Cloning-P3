@@ -96,6 +96,20 @@ class DataAugmentation:
             return samples
 
     @staticmethod
+    def equalize_histogram(image):
+        """ Equalizes the image histogram in order to improve the contrast.
+
+        :param image:  Input RGB image.
+
+        :return: Returns the equalized RGB image.
+        """
+        clahe = cv2.createCLAHE(clipLimit=1.0, tileGridSize=(8, 8))
+        hsv = cv2.cvtColor(image, cv2.COLOR_RGB2HLS)
+        hsv[:, :, 1] = clahe.apply(hsv[:, :, 1])
+
+        return cv2.cvtColor(hsv, cv2.COLOR_HLS2RGB)
+
+    @staticmethod
     def flip_image_horizontally(image, steering_angle, probability=1.0, lr_bias=0.0):
         """ Flip image horizontally with given 'probability'.
         
@@ -115,7 +129,7 @@ class DataAugmentation:
             p_left = 1. - p_right
             lr_coin = np.random.choice([1, 2], p=[p_left, p_right])
 
-            if (lr_coin == 1 and steering_angle < 0) or (lr_coin == 2 and steering_angle >= 0):
+            if lr_bias == 0.0 or (lr_coin == 1 and steering_angle < 0) or (lr_coin == 2 and steering_angle >= 0):
                 flipped_image = cv2.flip(image, 1)
                 flipped_steering_angle = -steering_angle
 
@@ -140,7 +154,7 @@ class DataAugmentation:
         if np.random.rand() <= probability:
             image_hsv = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
             image_hsv = np.array(image_hsv, dtype=np.float64)
-            rand_brightness = .1 + np.random.uniform()
+            rand_brightness = .15 + 0.5 * np.random.uniform()
             image_hsv[:, :, 2] = image_hsv[:, :, 2] * rand_brightness
             image_hsv[:, :, 2][image_hsv[:, :, 2] > 255] = 255
             image_hsv = np.array(image_hsv, dtype=np.uint8)
@@ -192,7 +206,7 @@ class DataAugmentation:
             shadow_mask = 0 * image_hsv[:, :, 2]
             shadow_mask[((ym - top_y) * (bot_x - top_x) - (bot_y - top_y) * (xm - top_x) >= 0)] = 1
 
-            random_bright = .2 + 0.4 * np.random.uniform()
+            random_bright = .1 + 0.4 * np.random.uniform()
             cond1 = shadow_mask == 1
             cond0 = shadow_mask == 0
 
@@ -229,9 +243,9 @@ class DataAugmentation:
             # ty = np.random.uniform(low=-max_translation[1], high=max_translation[1])
             # t_angle = steering_angle + (math.degrees(math.atan(tx / height)) / 25.)
             # t_angle = steering_angle + (tx * 0.004)
-            t_angle = steering_angle + tx / float(max_trans[0] * 2) * .2
+            t_angle = steering_angle + tx / float(max_trans[0] * 2) * .4
             M = np.float32([[1, 0, tx], [0, 1, ty]])
-            t_image = cv2.warpAffine(image, M, (width, height))  #, flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+            t_image = cv2.warpAffine(image, M, (width, height), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
 
             return t_image, t_angle
         else:
@@ -255,7 +269,7 @@ class DataAugmentation:
             height = image.shape[0]
             width = image.shape[1]
             rot = np.random.uniform(low=-max_rotation, high=max_rotation)
-            r_angle = steering_angle  # TODO: check rotation angle: - (rot / 25.)
+            r_angle = steering_angle + 0.3 * (rot / 25.)
             M = cv2.getRotationMatrix2D((height, width / 2), rot, 1)
             t_image = cv2.warpAffine(image, M, (width, height))  #, flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
 
@@ -282,12 +296,12 @@ class DataAugmentation:
             width = image.shape[1]
             tx = np.random.uniform(low=-max_trans[0], high=max_trans[0])
             ty = np.random.uniform(low=-max_trans[1], high=max_trans[1])
-            t_angle = steering_angle + (math.degrees(math.atan(tx / height)) / 25.)
-            t_angle = steering_angle + tx / float(max_trans[0] * 2) * .2
+            # TODO: t_angle = steering_angle + (math.degrees(math.atan(tx / height)) / 25.)
+            t_angle = steering_angle + tx / float(max_trans[0] * 2) * .9
             points1 = np.float32([[0, 0], [width, 0], [0, height], [width, height]])
             points2 = np.float32([[0+tx, 0+ty], [width+tx, 0+ty], [0, height], [width, height]])
             M = cv2.getPerspectiveTransform(points1, points2)
-            t_image = cv2.warpPerspective(image, M, (width, height))  #, flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+            t_image = cv2.warpPerspective(image, M, (width, height), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
 
             return t_image, t_angle
         else:
@@ -295,9 +309,9 @@ class DataAugmentation:
 
     @staticmethod
     def crop_image(image, roi, resize_size=None):
-        """
+        """ Crops and resizes the image.
         
-        :param image:       Input image.
+        :param image:       Input RGB image.
         :param roi:         Cropping area (region of interest) [x0, y0, x1, y1].
         :param resize_size: If not NOne the cropped image will be resized (width, height).
         
@@ -316,7 +330,8 @@ if __name__ == "__main__":
 
     print('Image augmentation:')
     print('Preparing training and validation datasets...', end='', flush=True)
-    samples = DataAugmentation.prepare_dataset('data/track_1_forwards.csv')
+    # TODO: ssamples = DataAugmentation.prepare_dataset('data/track_1_forwards.csv')
+    samples = DataAugmentation.prepare_dataset('data/track_2_forwards.csv')
     print('done')
 
     #
@@ -326,8 +341,8 @@ if __name__ == "__main__":
     nb_shown_images = 5
     nb_samples = len(samples)
 
-    # blurred, brightness and shadow images
-    fig1, axarr1 = plt.subplots(nb_shown_images, 4, figsize=(12, 9))
+    # blurred, equalized, brightness and shadow images
+    fig1, axarr1 = plt.subplots(nb_shown_images, 5, figsize=(16, 9))
     plt.subplots_adjust(left=0.04, right=0.98, top=0.9, bottom=0.05, wspace=0.03, hspace=0.03)
 
     # flipped, rotated and transformed images
@@ -359,6 +374,11 @@ if __name__ == "__main__":
         image_right = cv2.cvtColor(image_right, cv2.COLOR_BGR2RGB)
         steering_angle_right = float(samples[idx][3]) - (6.25 / 25.)
 
+        # improve contrast
+        equ_image = DataAugmentation.equalize_histogram(image)
+        equ_image_left = DataAugmentation.equalize_histogram(image_left)
+        equ_image_right = DataAugmentation.equalize_histogram(image_right)
+
         # augment images
         brightness_image = DataAugmentation.random_brightness(image)
         blurred_image = DataAugmentation.random_blur(image)
@@ -366,7 +386,7 @@ if __name__ == "__main__":
         flipped_image, flipped_steering_angle = DataAugmentation.flip_image_horizontally(image, steering_angle)
         translated_image, translated_steering_angle = DataAugmentation.random_translation(image, steering_angle, [30, 30])
         rotated_image, rotated_steering_angle = DataAugmentation.random_rotation(image, steering_angle, 10.)
-        transformed_image, transformed_steering_angle = DataAugmentation.random_perspective_transformation(image, steering_angle, [40, 50])
+        transformed_image, transformed_steering_angle = DataAugmentation.random_perspective_transformation(image, steering_angle, [200, 50])  # 40, 50
 
         # crop images
         width = image.shape[1]
@@ -398,15 +418,17 @@ if __name__ == "__main__":
         cropped_rotated_image = DataAugmentation.draw_steering_angles(cropped_rotated_image, steering_angle=steering_angle, augmented_steering_angle=rotated_steering_angle)
         cropped_transformed_image = DataAugmentation.draw_steering_angles(cropped_transformed_image, steering_angle=steering_angle, augmented_steering_angle=transformed_steering_angle)
 
-        # show blurred, brightness and shadow images
+        # show blurred, equalized, brightness and shadow images
         axarr1[i, 0].imshow(image)
         axarr1[i, 0].axis('off')
-        axarr1[i, 1].imshow(brightness_image)
+        axarr1[i, 1].imshow(equ_image)
         axarr1[i, 1].axis('off')
-        axarr1[i, 2].imshow(blurred_image)
+        axarr1[i, 2].imshow(brightness_image)
         axarr1[i, 2].axis('off')
-        axarr1[i, 3].imshow(shadow_image)
+        axarr1[i, 3].imshow(blurred_image)
         axarr1[i, 3].axis('off')
+        axarr1[i, 4].imshow(shadow_image)
+        axarr1[i, 4].axis('off')
 
         # show flipped, rotated and transformed images
         axarr2[i, 0].imshow(image)
@@ -450,9 +472,10 @@ if __name__ == "__main__":
 
     # set titles blurred, brightness and shadow images
     axarr1[0, 0].set_title('original')
-    axarr1[0, 1].set_title('brightness')
-    axarr1[0, 2].set_title('blurred')
-    axarr1[0, 3].set_title('shadow')
+    axarr1[0, 1].set_title('hist. equalized')
+    axarr1[0, 2].set_title('brightness')
+    axarr1[0, 3].set_title('blurred')
+    axarr1[0, 4].set_title('shadow')
 
     # set titles cropped images
     axarr3[0, 0].set_title('cropped original')
