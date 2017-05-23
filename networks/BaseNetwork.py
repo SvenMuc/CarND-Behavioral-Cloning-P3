@@ -30,7 +30,7 @@ class BaseNetwork:
     nb_validation_samples = 0        # Total number if validation samples after augmentation (produced by generator)
     path_to_image_data = ''          # Path to image data (replaces the path in the train/valid samples)
     history_object = None            # History object contains the loss and val_loss data after network training
-    roi = None                       # Region of interesst which will be cropped before feeded into the first model layer
+    roi = None                       # Region of interest which will be cropped before feeded into the first model layer
     verbose = 0                      # 1 = verbose mode (prints internal debug information), 2 = show generator images
 
     def __init__(self, model_name, input_width, input_height, input_depth, nb_classes, regression=False,
@@ -67,6 +67,7 @@ class BaseNetwork:
         """ Pre-processing pipeline for model input image. The method applies the following steps:
 
             - crop and resize image
+            - equalize histogram (contrast improvement)
                 
         :param image:  Image which shall be preprocessed (Input format: RGB coded image!).
         :param width:  Width of the model input image. If smaller than original image, the image will be resized.
@@ -76,8 +77,11 @@ class BaseNetwork:
         :return: Returns the pre-processed image.
         """
 
-        # TODO: image_hsv = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
-        return da.DataAugmentation.crop_image(image, roi, (width, height))
+        # image_yuv = cv2.cvtColor(image, cv2.COLOR_RGB2YUV)
+        cropped_image = da.DataAugmentation.crop_image(image, roi, (width, height))
+
+        # TODO: return da.DataAugmentation.equalize_histogram(cropped_image)
+        return cropped_image
 
     def generator(self, samples, batch_size=128, augment=True):
         """ Generator
@@ -93,7 +97,6 @@ class BaseNetwork:
 
         nb_samples = len(samples)
         nb_total_samples = 0
-        color_scheme = cv2.COLOR_BGR2RGB
 
         while 1:  # loop forever so the generator never terminates
             for offset in range(0, nb_samples, batch_size):
@@ -116,40 +119,43 @@ class BaseNetwork:
                         if clr == 0:
                             # add center image
                             image = cv2.imread(self.path_to_image_data + '/' + batch_sample[0].lstrip())
-                            image = cv2.cvtColor(image, color_scheme)
                             angle = angle_center
                         elif clr == 1:
                             # add left image
                             image = cv2.imread(self.path_to_image_data + '/' + batch_sample[1].lstrip())
-                            image = cv2.cvtColor(image, color_scheme)
                             angle = angle_center + self.steering_angle_correction
                         elif clr == 2:
                             # add right image
                             image = cv2.imread(self.path_to_image_data + '/' + batch_sample[2].lstrip())
-                            image = cv2.cvtColor(image, color_scheme)
                             angle = angle_center - self.steering_angle_correction
 
+                        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
                         # apply random translation
-                        # TODO: image, angle = da.DataAugmentation.random_translation(image, angle, [30, 30], probability=0.5)
+                        image, angle = da.DataAugmentation.random_translation(image, angle, [70, 30], probability=0.5)
 
                         # apply random perspective transformation
-                        image, angle = da.DataAugmentation.random_perspective_transformation(image, angle, [40, 50], probability=0.5)
+                        # TODO: image, angle = da.DataAugmentation.random_perspective_transformation(image, angle, [100, 50], probability=0.5)
 
                         # apply shadow augmentation
-                        # TODO: image = da.DataAugmentation.random_shadow(image, probability=0.5)
+                        image = da.DataAugmentation.random_shadow(image, probability=0.5)
 
                         # crop and resize image
                         image = da.DataAugmentation.crop_image(image, self.roi, crop_size)
+
+                        # improve contrast by histogram equalization
+                        # TODO: image = da.DataAugmentation.equalize_histogram(image)
 
                         # apply random flip, lr_bias = 0.0 (no left/right bias correction of dataset)
                         image, angle = da.DataAugmentation.flip_image_horizontally(image, angle, probability=0.5, lr_bias=0.0)
 
                         # apply random brightness
-                        # TODO: image = da.DataAugmentation.random_brightness(image, probability=0.5)
+                        image = da.DataAugmentation.random_brightness(image, probability=0.5)
+
                     else:
                         # add center image
                         image = cv2.imread(self.path_to_image_data + '/' + batch_sample[0].lstrip())
-                        image = cv2.cvtColor(image, color_scheme)
+                        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
                         image = da.DataAugmentation.crop_image(image, self.roi, crop_size)
                         angle = angle_center
 
@@ -245,9 +251,9 @@ class BaseNetwork:
         """ Print a model representation summary."""
         self.model.summary()
 
-    # def save_model_graph(self, filename):
-    #     """ Saves the model graph to a PNG file.
-    #
-    #     :param filename: Output filename (*.png).
-    #     """
-    #     plot(self.model, to_file=filename, show_shapes=True, show_layer_names=True)
+    def save_model_graph(self, filename):
+        """ Saves the model graph to a PNG file.
+
+        :param filename: Output filename (*.png).
+        """
+        # TODO: plot(self.model, to_file=filename, show_shapes=True, show_layer_names=True)
