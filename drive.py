@@ -17,10 +17,10 @@ from keras.models import load_model
 import h5py
 from keras import __version__ as keras_version
 from networks.BaseNetwork import BaseNetwork
-from Filter import Filter
+# TODO: from Filter import Filter
 from model import IMAGE_WIDTH, IMAGE_HEIGHT, ROI
 from DataAugmentation import DataAugmentation
-import cv2
+# TODO: import cv2
 
 
 sio = socketio.Server()
@@ -50,11 +50,12 @@ class SimplePIController:
         return self.Kp * self.error + self.Ki * self.integral
 
 
-controller = SimplePIController(0.1, 0.002)
-set_speed = 9
+controller = SimplePIController(0.1, 0.0022) # org: 0.1, 0.002
+set_speed = 10
 controller.set_desired(set_speed)
 
-# filter = Filter()
+recovery = 0            # hack to avoid vehicle standstill situations in the simulation
+# TODO: filter = Filter()
 
 
 def bar(value, range=[-1., 1.], prefix='', suffix=''):
@@ -101,27 +102,34 @@ def telemetry(sid, data):
         # TODO: steering_angle = filter.moving_average(steering_angle, window_size=8)
 
         # adjust set speed depending on predicted steering angle
-        if np.abs(steering_angle) > 17. / 25.:
-            controller.set_desired(5)
-        elif np.abs(steering_angle) > 13 / 25.:
-            controller.set_desired(7)
-        elif np.abs(steering_angle) > 9. / 25.:
-            controller.set_desired(9)
+        if np.abs(steering_angle) > 17.7 / 25.:
+            controller.set_desired(set_speed * 0.5)
+            info_text = '<<< SLOW DOWN >>>'
         else:
-            controller.set_desired(10)
+            controller.set_desired(set_speed)
+            info_text = ''
 
         # emergency brake for driving downhill
         if speed > (controller.set_point + 10):
-            throttle = 0.
-            print('<<< Emergency brake >>>')
+            controller.set_desired(3)
+            info_text = '<<<< EMERGENCY BRAKE >>>>'
 
         throttle = controller.update(speed)
-        send_control(steering_angle, throttle)
+
+        global recovery     # hack to avoid vehicle standstill in simulation
+
+        if speed <= 0.01 and recovery > 0:
+            recovery = max(0, recovery - 1)
+            info_text += '<<< RECOVERY MODE >>>'
+            send_control(0, -1.)
+        else:    
+            send_control(steering_angle, throttle)
+            recovery = 3
 
         # show status
         bar(steering_angle, prefix='angle: ', suffix=' {:7.2f}°'.format(steering_angle * 25.))
         bar(throttle, prefix='  throttle: ', suffix=' {:5.2f}'.format(throttle))
-        print('  speed: {:5.2f} / {:5.2f} mph'.format(speed, controller.set_point))
+        print('  speed: {:5.2f} / {:5.2f} mph {:s}'.format(speed, controller.set_point, info_text))
 
         # save frame
         if args.image_folder != '':
@@ -130,7 +138,7 @@ def telemetry(sid, data):
             image = Image.fromarray(DataAugmentation.draw_steering_angles(image_array, steering_angle=steering_angle))
             image.save('{}.jpg'.format(image_filename))
 
-            # show steering angle prediction in image
+            # TODO: show steering angle prediction in image
             # image_array = cv2.cvtColor(image_array, cv2.COLOR_RGB2BGR)
             # cv2.imshow('Predicted steering angle', image_array)
             # cv2.waitKey(1)
