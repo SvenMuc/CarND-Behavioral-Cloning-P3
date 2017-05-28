@@ -18,7 +18,6 @@ from Filter import Filter
 from model import CFG_DATASET_PATH, VALIDATION_SET_SIZE, ROI, IMAGE_WIDTH, IMAGE_HEIGHT
 from model import STEERING_ANGLE_CORRECTION
 
-np.random.seed()
 
 def prepare_datasets(csv_filename, validation_set_proportion=0.0):
     """ Prepares the training and validation datasets (images and measurements) from driving log cvs file.
