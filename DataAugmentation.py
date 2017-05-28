@@ -32,15 +32,51 @@ class DataAugmentation:
         return samples
 
     @staticmethod
-    def show_images(original_image, augmented_image):
-        """ Shows the original and augmented image.
-        
-        :param original_image:  Original image. 
-        :param augmented_image: Augmented image.
+    def draw_overlay(image, frame=None, steering_angle=None, speed=None, color=(255, 255, 255)):
+        """ Draws the image overlay like frame ID, speed, steering angle and the steering angle arrow.
+
+        :param image:          Input image.
+        :param frame:          Frame ID.
+        :param steering_angle: Steering angle in degree.
+        :param speed:          Speed in mph.
+        :param color:          Text color as RGB array (R, G, B).
+
+        :return: Returns the image with info text.
         """
 
-        # TODO: implement show_images method.
-        return False
+        pos_x = 5
+        pos_y = 15
+        fontFace = cv2.FONT_HERSHEY_SIMPLEX
+        fontScale = 0.4
+        thickness = 1
+        i = 0
+
+        textSize = cv2.getTextSize('frame:', fontFace=fontFace, fontScale=fontScale, thickness=thickness)[0]
+
+        if frame is not None:
+            cv2.putText(img=image, text='frame:  {:05d}'.format(frame),
+                        org=(pos_x, pos_y),
+                        fontFace=fontFace, fontScale=fontScale, color=color, thickness=thickness)
+            i += 1
+
+        if speed is not None:
+            cv2.putText(img=image, text='speed: {:6.2f} mph'.format(speed),
+                        org=(pos_x, pos_y + i * (textSize[1] + 3)),
+                        fontFace=fontFace, fontScale=fontScale, color=color, thickness=thickness)
+            i += 1
+
+        if steering_angle is not None:
+            cv2.putText(img=image, text='angle: {:6.2f} deg'.format(steering_angle),
+                        org=(pos_x, pos_y + i * (textSize[1] + 3)),
+                        fontFace=fontFace, fontScale=fontScale, color=color, thickness=thickness)
+
+            height = image.shape[0]
+            width = image.shape[1]
+            p0 = (int(width / 2), height)
+            p1 = (int(width / 2) + int(height / 2 * math.tan(math.radians(steering_angle))), int(height / 2))
+            cv2.line(image, p0, p1, color=(0, 255, 0), thickness=1, lineType=cv2.LINE_AA)
+
+        return image
 
     @staticmethod
     def draw_steering_angles(image, steering_angle=None, augmented_steering_angle=None):
@@ -59,14 +95,14 @@ class DataAugmentation:
 
         # draw steering angle
         if steering_angle is not None:
-            # TODO: p1 = (int(width / 2) + int(height / 2 * math.tan(math.radians(steering_angle * 25.))), int(height / 2))
-            p1 = (int(width / 2) + int(height * math.tan(math.radians(steering_angle * 25.))), 0)
+            p1 = (int(width / 2) + int(height / 2 * math.tan(math.radians(steering_angle * 25.))), int(height / 2))
+            # TODO: p1 = (int(width / 2) + int(height * math.tan(math.radians(steering_angle * 25.))), 0)
             cv2.line(image, p0, p1, color=(0, 255, 0), thickness=1, lineType=cv2.LINE_AA)
 
         # draw augmented steering angle
         if augmented_steering_angle is not None:
-            # TODO: p1 = (int(width / 2) + int(height / 2 * math.tan(math.radians(augmented_steering_angle * 25.))), int(height / 2))
-            p1 = (int(width / 2) + int(height * math.tan(math.radians(augmented_steering_angle * 25.))), 0)
+            p1 = (int(width / 2) + int(height / 2 * math.tan(math.radians(augmented_steering_angle * 25.))), int(height / 2))
+            # TODO: p1 = (int(width / 2) + int(height * math.tan(math.radians(augmented_steering_angle * 25.))), 0)
             cv2.line(image, p0, p1, color=(255, 0, 0), thickness=1, lineType=cv2.LINE_AA)
 
         return image
@@ -103,11 +139,13 @@ class DataAugmentation:
 
         :return: Returns the equalized RGB image.
         """
-        clahe = cv2.createCLAHE(clipLimit=1.0, tileGridSize=(8, 8))
-        hsv = cv2.cvtColor(image, cv2.COLOR_RGB2HLS)
-        hsv[:, :, 1] = clahe.apply(hsv[:, :, 1])
+        clahe = cv2.createCLAHE(clipLimit=0.95, tileGridSize=(8, 8))
+        hls = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+        hls[:, :, 0] = clahe.apply(hls[:, :, 0])
+        hls[:, :, 1] = clahe.apply(hls[:, :, 1])
+        hls[:, :, 2] = clahe.apply(hls[:, :, 2])
 
-        return cv2.cvtColor(hsv, cv2.COLOR_HLS2RGB)
+        return cv2.cvtColor(hls, cv2.COLOR_BGR2RGB)
 
     @staticmethod
     def flip_image_horizontally(image, steering_angle, probability=1.0, lr_bias=0.0):
@@ -154,7 +192,7 @@ class DataAugmentation:
         if np.random.rand() <= probability:
             image_hsv = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
             image_hsv = np.array(image_hsv, dtype=np.float64)
-            rand_brightness = .15 + 0.5 * np.random.uniform()
+            rand_brightness = .2 + 0.5 * np.random.uniform()
             image_hsv[:, :, 2] = image_hsv[:, :, 2] * rand_brightness
             image_hsv[:, :, 2][image_hsv[:, :, 2] > 255] = 255
             image_hsv = np.array(image_hsv, dtype=np.uint8)
@@ -195,29 +233,65 @@ class DataAugmentation:
             height = image.shape[0]
             width = image.shape[1]
 
-            top_x, top_y = width * np.random.uniform(), 0
-            bot_x, bot_y = height, width * np.random.uniform()
-            xm = np.mgrid[0:height, 0:width][1]
-            ym = np.mgrid[0:height, 0:width][0]
+            shadow_type = np.random.choice(['half', 'strip'])
 
-            image_hsv = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
-            image_hsv = np.array(image_hsv, dtype=np.float64)
+            if shadow_type == 'half':
+                # mask half of the image with shadow
+                top_x, top_y = width * np.random.uniform(), height * np.random.uniform()
+                bot_x, bot_y = width * np.random.uniform(), height * np.random.uniform()
+                xm = np.mgrid[0:height, 0:width][1]
+                ym = np.mgrid[0:height, 0:width][0]
 
-            shadow_mask = 0 * image_hsv[:, :, 2]
-            shadow_mask[((ym - top_y) * (bot_x - top_x) - (bot_y - top_y) * (xm - top_x) >= 0)] = 1
+                image_hsv = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
+                image_hsv = np.array(image_hsv, dtype=np.float64)
 
-            random_bright = .1 + 0.4 * np.random.uniform()
-            cond1 = shadow_mask == 1
-            cond0 = shadow_mask == 0
+                shadow_mask = 0 * image_hsv[:, :, 2]
+                shadow_mask[((ym - top_y) * (bot_x - top_x) - (bot_y - top_y) * (xm - top_x) >= 0)] = 1
 
-            if np.random.randint(2) == 1:
-                image_hsv[:, :, 2][cond1] = image_hsv[:, :, 2][cond1] * random_bright
-            else:
-                image_hsv[:, :, 2][cond0] = image_hsv[:, :, 2][cond0] * random_bright
+                random_bright = .2 + 0.5 * np.random.uniform()
+                cond1 = shadow_mask == 1
+                cond0 = shadow_mask == 0
 
-            image_hsv[:, :, 2][image_hsv[:, :, 2] > 255] = 255
-            image_hsv = np.array(image_hsv, dtype=np.uint8)
-            return cv2.cvtColor(image_hsv, cv2.COLOR_HSV2RGB)
+                if np.random.randint(2) == 1:
+                    image_hsv[:, :, 2][cond1] = image_hsv[:, :, 2][cond1] * random_bright
+                else:
+                    image_hsv[:, :, 2][cond0] = image_hsv[:, :, 2][cond0] * random_bright
+
+                image_hsv[:, :, 2][image_hsv[:, :, 2] > 255] = 255
+                image_hsv = np.array(image_hsv, dtype=np.uint8)
+                return cv2.cvtColor(image_hsv, cv2.COLOR_HSV2RGB)
+            elif shadow_type == 'strip':
+                # add shadow strip
+                shadow_image = np.copy(image)
+                overlay = np.copy(image)
+
+                direction = 'bottom' # np.random.choice(['left', 'right', 'top', 'bottom'])
+
+                if direction == 'left':
+                    pt0 = [0, np.random.randint(0, 0.6 * height)]
+                    pt1 = [np.random.randint(0.1 * width, 0.9 * width), np.random.randint(0, 0.8 * height)]
+                    pt2 = [np.random.randint(0.1 * width, 0.9 * width), np.random.randint(min(pt1[1] * 1.2, height - 1), height)]
+                    pt3 = [0, np.random.randint(min(pt0[1] * 1.5, height - 1), height)]
+                elif direction == 'right':
+                    pt0 = [width, np.random.randint(0, 0.6 * height)]
+                    pt1 = [np.random.randint(0.1 * width, 0.9 * width), np.random.randint(0, 0.8 * height)]
+                    pt2 = [np.random.randint(0.1 * width, 0.9 * width), np.random.randint(min(pt1[1] * 1.2, height - 1), height)]
+                    pt3 = [width, np.random.randint(min(pt0[1] * 1.5, height - 1), height)]
+                elif direction == 'top':
+                    pt0 = [np.random.randint(0, 0.6 * width), 0]
+                    pt1 = [np.random.randint(0, 0.8 * width), np.random.randint(0.5 * height, height)]
+                    pt2 = [np.random.randint(min(pt1[0] * 1.2, width - 1), width), np.random.randint(0.5 * height, height)]
+                    pt3 = [np.random.randint(min(pt0[0] * 1.5, width - 1), width), 0]
+                elif direction == 'bottom':
+                    pt0 = [np.random.randint(0, 0.6 * width), height]
+                    pt1 = [np.random.randint(0, 0.8 * width), np.random.randint(0, 0.5 * height)]
+                    pt2 = [np.random.randint(min(pt1[0] * 1.2, width - 1), width), np.random.randint(0, 0.5 * height)]
+                    pt3 = [np.random.randint(min(pt0[0] * 1.5, width - 1), width), height]
+
+                pts = np.array([pt0, pt1, pt2, pt3], np.int32)
+                overlay = cv2.fillPoly(overlay, pts=[pts], color=(0, 0, 0))
+                alpha = np.random.uniform(0.6, 0.85)
+                return cv2.addWeighted(overlay, alpha, shadow_image, 1 - alpha, 0, shadow_image)
         else:
             return image
 
@@ -296,7 +370,6 @@ class DataAugmentation:
             width = image.shape[1]
             tx = np.random.uniform(low=-max_trans[0], high=max_trans[0])
             ty = np.random.uniform(low=-max_trans[1], high=max_trans[1])
-            # TODO: t_angle = steering_angle + (math.degrees(math.atan(tx / height)) / 25.)
             t_angle = steering_angle + tx / float(max_trans[0] * 2) * .9
             points1 = np.float32([[0, 0], [width, 0], [0, height], [width, height]])
             points2 = np.float32([[0+tx, 0+ty], [width+tx, 0+ty], [0, height], [width, height]])
@@ -330,9 +403,23 @@ if __name__ == "__main__":
 
     print('Image augmentation:')
     print('Preparing training and validation datasets...', end='', flush=True)
-    # TODO: ssamples = DataAugmentation.prepare_dataset('data/track_1_forwards.csv')
-    samples = DataAugmentation.prepare_dataset('data/track_2_forwards.csv')
+    # samples = DataAugmentation.prepare_dataset('data/track_1_forwards.csv')
+    samples = DataAugmentation.prepare_dataset('data/track_2_special.csv')
     print('done')
+
+    #
+    # Show random shadow images
+    #
+    # for i in range(len(samples)):
+    #     idx = randint(0, len(samples))
+    #     dataset_path = './data'
+    #
+    #     # load random images
+    #     image = cv2.imread(dataset_path + '/' + samples[idx][0].lstrip())
+    #     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    #     image = DataAugmentation.random_shadow(image)
+    #     cv2.imshow('Shadow augmentation', cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
+    #     cv2.waitKey(700)
 
     #
     # Show augmented images
