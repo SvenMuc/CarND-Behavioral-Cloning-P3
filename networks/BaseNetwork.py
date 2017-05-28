@@ -66,9 +66,10 @@ class BaseNetwork:
     def preprocess_image(image, width, height, roi):
         """ Pre-processing pipeline for model input image. The method applies the following steps:
 
+            - DEACTIVATED: equalize histogram (contrast improvement)
             - crop and resize image
-            - equalize histogram (contrast improvement)
-                
+            - DEACTIVATED: convert RGB to YUV color scheme
+
         :param image:  Image which shall be preprocessed (Input format: RGB coded image!).
         :param width:  Width of the model input image. If smaller than original image, the image will be resized.
         :param height: Height of the model input image. If smaller than original image, the image will be resized.
@@ -77,11 +78,13 @@ class BaseNetwork:
         :return: Returns the pre-processed image.
         """
 
-        # image_yuv = cv2.cvtColor(image, cv2.COLOR_RGB2YUV)
-        cropped_image = da.DataAugmentation.crop_image(image, roi, (width, height))
+        # Deactivated pre-processing steps:
+        # equ_image = da.DataAugmentation.equalize_histogram(image)
+        # cropped_image = da.DataAugmentation.crop_image(equ_image, roi, (width, height))
+        # return cv2.cvtColor(cropped_image, cv2.COLOR_RGB2YUV)
+        # return cropped_image
 
-        # TODO: return da.DataAugmentation.equalize_histogram(cropped_image)
-        return cropped_image
+        return da.DataAugmentation.crop_image(image, roi, (width, height))
 
     def generator(self, samples, batch_size=128, augment=True):
         """ Generator
@@ -106,7 +109,6 @@ class BaseNetwork:
                 images = []
                 angles = []
                 crop_size = (self.input_width, self.input_height)
-                i = 0
 
                 for batch_sample in batch_samples:
                     angle_center = float(batch_sample[3])
@@ -140,12 +142,6 @@ class BaseNetwork:
                         # apply shadow augmentation
                         image = da.DataAugmentation.random_shadow(image, probability=0.5)
 
-                        # crop and resize image
-                        image = da.DataAugmentation.crop_image(image, self.roi, crop_size)
-
-                        # improve contrast by histogram equalization
-                        # TODO: image = da.DataAugmentation.equalize_histogram(image)
-
                         # apply random flip, lr_bias = 0.0 (no left/right bias correction of dataset)
                         image, angle = da.DataAugmentation.flip_image_horizontally(image, angle, probability=0.5, lr_bias=0.0)
 
@@ -156,13 +152,16 @@ class BaseNetwork:
                         # add center image
                         image = cv2.imread(self.path_to_image_data + '/' + batch_sample[0].lstrip())
                         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-                        image = da.DataAugmentation.crop_image(image, self.roi, crop_size)
                         angle = angle_center
+
+                    # final image pre-processing: improve contrast by histogram equalization and convert to HSV
+                    # TODO: image = da.DataAugmentation.equalize_histogram(image)
+                    image = da.DataAugmentation.crop_image(image, self.roi, crop_size)
+                    # TODO: image = cv2.cvtColor(image, cv2.COLOR_RGB2YUV)
 
                     images.append(image)
                     angles.append(angle)
                     nb_batch_samples += 1
-                    i += 1
 
                     if self.verbose == 2:
                         # show generated images in a separate window
@@ -199,7 +198,7 @@ class BaseNetwork:
         self.nb_validation_samples = len(validation_samples)
 
         self.train_generator = self.generator(self.train_samples, batch_size=self.batch_size, augment=True)
-        self.validation_generator = self.generator(self.validation_samples, batch_size=self.batch_size, augment=False)
+        self.validation_generator = self.generator(self.validation_samples, batch_size=self.batch_size, augment=True)
 
     def train(self, nb_epochs, nb_samples_per_epoch, learning_rate=0.001, verbose=1):
         """
@@ -214,8 +213,8 @@ class BaseNetwork:
         """
 
         filepath = self.model_name + '_checkpoint_{epoch:02d}_{val_loss:.4f}.h5'
-        checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=False, mode='max')
-        early_stopping = EarlyStopping(monitor='val_loss', patience=2, verbose=True)
+        checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=False, mode='min')
+        early_stopping = EarlyStopping(monitor='val_loss', patience=3, verbose=True)
 
         optimizer = adam(lr=learning_rate)
         self.nb_samples_per_epoch = nb_samples_per_epoch
