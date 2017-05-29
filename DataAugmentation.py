@@ -265,7 +265,7 @@ class DataAugmentation:
                 shadow_image = np.copy(image)
                 overlay = np.copy(image)
 
-                direction = 'bottom' # np.random.choice(['left', 'right', 'top', 'bottom'])
+                direction = np.random.choice(['left', 'right', 'top', 'bottom'])
 
                 if direction == 'left':
                     pt0 = [0, np.random.randint(0, 0.6 * height)]
@@ -296,15 +296,16 @@ class DataAugmentation:
             return image
 
     @staticmethod
-    def random_translation(image, steering_angle, max_trans, probability=1.0):
+    def random_translation(image, steering_angle, max_trans, probability=1.0, border_replication=True):
         """ Translates (shift) the image randomly horizontally and vertically with given 'probability'.
         
         ATTENTION: This method shall only be applied, if the car is driving in the center of the road.
         
-        :param image:           Input RGB image.
-        :param steering_angle:  Input steering angle.
-        :param max_trans:       Max translation in pixel [tx_max, ty_max].
-        :param probability:     Apply random translation probability [0..1].
+        :param image:              Input RGB image.
+        :param steering_angle:     Input steering angle.
+        :param max_trans:          Max translation in pixel [tx_max, ty_max].
+        :param probability:        Apply random translation probability [0..1].
+        :param border_replication: If true, the border will be replicated.
         
         :return: Returns the randomly translated RGB image and the augmented steering angle.
         """
@@ -319,22 +320,27 @@ class DataAugmentation:
             # t_angle = steering_angle + (tx * 0.004)
             t_angle = steering_angle + tx / float(max_trans[0] * 2) * .4
             M = np.float32([[1, 0, tx], [0, 1, ty]])
-            t_image = cv2.warpAffine(image, M, (width, height), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+
+            if border_replication:
+                t_image = cv2.warpAffine(image, M, (width, height), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+            else:
+                t_image = cv2.warpAffine(image, M, (width, height))
 
             return t_image, t_angle
         else:
             return image, steering_angle
 
     @staticmethod
-    def random_rotation(image, steering_angle, max_rotation, probability=1.0):
+    def random_rotation(image, steering_angle, max_rotation, probability=1.0, border_replication=True):
         """ Rotates the image randomly around mid of bottom image row with given 'probability'.
         
         ATTENTION: This method shall only be applied, if the car is driving in the center of the road.
         
-        :param image:          Input RGB image.
-        :param steering_angle: Input steering angle.
-        :param max_rotation:   Max rotation angle in degree.
-        :param probability:    Apply random rotation probability [0..1].
+        :param image:              Input RGB image.
+        :param steering_angle:     Input steering angle.
+        :param max_rotation:       Max rotation angle in degree.
+        :param probability:        Apply random rotation probability [0..1].
+        :param border_replication: If true, the border will be replicated.
         
         :return: Returns the randomly rotated RGB image and the augmented steering angle.
         """
@@ -345,22 +351,27 @@ class DataAugmentation:
             rot = np.random.uniform(low=-max_rotation, high=max_rotation)
             r_angle = steering_angle + 0.3 * (rot / 25.)
             M = cv2.getRotationMatrix2D((height, width / 2), rot, 1)
-            t_image = cv2.warpAffine(image, M, (width, height))  #, flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
 
-            return t_image, r_angle
+            if border_replication:
+                r_image = cv2.warpAffine(image, M, (width, height), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+            else:
+                r_image = cv2.warpAffine(image, M, (width, height))
+
+            return r_image, r_angle
         else:
             return image, steering_angle
 
     @staticmethod
-    def random_perspective_transformation(image, steering_angle, max_trans, probability=1.0):
+    def random_perspective_transformation(image, steering_angle, max_trans, probability=1.0, border_replication=True):
         """ Applies random perspective transformation to image to simulate curves with given 'probability'.
         
         ATTENTION: This method shall only be applied, if the car is driving in the center of the road.
         
-        :param image:          Input RGB image.
-        :param steering_angle: Input steering angle.
-        :param max_trans:      Max transformation in pixel [tx_max, ty_max].
-        :param probability:    Apply random perspective transformation probability [0..1].
+        :param image:              Input RGB image.
+        :param steering_angle:     Input steering angle.
+        :param max_trans:          Max transformation in pixel [tx_max, ty_max].
+        :param probability:        Apply random perspective transformation probability [0..1].
+        :param border_replication: If true, the border will be replicated.
         
         :return: Returns the randomly perspective transformed RGB image and the augmented steering angle.
         """
@@ -374,7 +385,11 @@ class DataAugmentation:
             points1 = np.float32([[0, 0], [width, 0], [0, height], [width, height]])
             points2 = np.float32([[0+tx, 0+ty], [width+tx, 0+ty], [0, height], [width, height]])
             M = cv2.getPerspectiveTransform(points1, points2)
-            t_image = cv2.warpPerspective(image, M, (width, height), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+
+            if border_replication:
+                t_image = cv2.warpPerspective(image, M, (width, height), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+            else:
+                t_image = cv2.warpPerspective(image, M, (width, height))
 
             return t_image, t_angle
         else:
@@ -404,7 +419,9 @@ if __name__ == "__main__":
     print('Image augmentation:')
     print('Preparing training and validation datasets...', end='', flush=True)
     # samples = DataAugmentation.prepare_dataset('data/track_1_forwards.csv')
-    samples = DataAugmentation.prepare_dataset('data/track_2_special.csv')
+    # samples = DataAugmentation.prepare_dataset('data/track_2_special.csv')
+    samples = DataAugmentation.prepare_dataset('data/track_1_fbrus_2_fbrs_ra0.9.csv')
+    # samples = DataAugmentation.prepare_dataset('data/track_1_udacity.csv')
     print('done')
 
     #
@@ -479,7 +496,7 @@ if __name__ == "__main__":
         width = image.shape[1]
         height = image.shape[0]
         roi = [20, 60, width - 20, height - 22]
-        size = (320, 160)
+        size = (64, 64)
 
         cropped_image = DataAugmentation.crop_image(image, roi, size)
         cropped_brightness_image = DataAugmentation.crop_image(brightness_image, roi, size)
