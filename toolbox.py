@@ -86,6 +86,8 @@ def plot_normed_steering_angle_histogram(steering_angles, title='Histogram of st
 
     # add a line showing the expected distribution
     (mu, sigma) = norm.fit(steering_angles)
+    min_steering_angle = min(steering_angles)
+    max_steering_angle = max(steering_angles)
     y = mlab.normpdf(bins, mu, sigma)
     # ax2 = ax1.twinx()
     ax1.plot(bins, y, 'r--', linewidth=1.5, label='norm')
@@ -94,7 +96,7 @@ def plot_normed_steering_angle_histogram(steering_angles, title='Histogram of st
     ax1.legend()
     math_title = r'$\mathrm{%s}$' % title.replace(' ', '\ ')
     math_title += '\n'
-    math_title += r'$(\mu=%.4f,\ \sigma=%.4f,\ N=%d)$' % (mu, sigma, len(steering_angles))
+    math_title += r'$(\mu=%.4f°,\ \sigma=%.4f°,\ min=%.2f°\ max=%.2f°\ N=%d)$' % (mu, sigma, min_steering_angle, max_steering_angle, len(steering_angles))
     fig.suptitle(math_title)
 
     if show:
