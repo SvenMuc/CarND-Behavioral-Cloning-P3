@@ -50,21 +50,23 @@ class SimplePIController:
         return self.Kp * self.error + self.Ki * self.integral
 
 
-controller = SimplePIController(0.1, 0.0022) # org: 0.1, 0.002
-set_speed = 10
+controller = SimplePIController(0.1, 0.003) # org: 0.1, 0.002
+set_speed = 15
 controller.set_desired(set_speed)
 
-recovery = 0            # hack to avoid vehicle standstill situations in the simulation
+recovery = 0                              # hack to avoid vehicle standstill situations in the simulation
+frame = 0
 # TODO: filter = Filter()
 
 
-def bar(value, range=[-1., 1.], prefix='', suffix=''):
+def bar(value, range=[-1., 1.], prefix='', suffix='', limit=None):
     """ Shows graph like this [-----|-----] in the console.
 
     :param value:  Value which shall be shown.
     :param range:  Range of graph.
     :param prefix: Text shown before the graph.
     :param suffix: Text shown behind the graph.
+    :param limit:  Draws a limit bar `|` at the pos/neg limit position.
     """
 
     bar_len = 21
@@ -73,7 +75,14 @@ def bar(value, range=[-1., 1.], prefix='', suffix=''):
 
     list = ['-'] * bar_len
     list[int(bar_len / 2)] = '+'
-    list[value_pos] = '∆'
+
+    if limit is not None:
+        threshold_pos_0 = max(min(int(bar_len * (limit + r / 2.) / r), bar_len - 1), 0)
+        threshold_pos_1 = max(min(int(bar_len * (-limit + r / 2.) / r), bar_len - 1), 0)
+        list[threshold_pos_0] = '|'
+        list[threshold_pos_1] = '|'
+
+    list[value_pos] = '\033[97m∆\033[00m'
 
     str = ''.join(list)
     sys.stdout.write('{:s}[{:s}] {:s}'.format(prefix, str, suffix))
@@ -101,26 +110,22 @@ def telemetry(sid, data):
         # filter steering angle by moving average
         # TODO: steering_angle = filter.moving_average(steering_angle, window_size=8)
 
-        # adjust set speed depending on predicted steering angle
-        if np.abs(steering_angle) > 17.7 / 25.:
-            controller.set_desired(set_speed * 0.5)
-            info_text = '<<< SLOW DOWN >>>'
+        # emergency brake to handle downhill driving
+        if speed > (controller.set_point + 7):
+            controller.set_desired(3)
+            info_text = '\033[91m<<<< EMERGENCY BRAKE >>>>\033[00m'
         else:
             controller.set_desired(set_speed)
             info_text = ''
 
-        # emergency brake for driving downhill
-        if speed > (controller.set_point + 10):
-            controller.set_desired(3)
-            info_text = '<<<< EMERGENCY BRAKE >>>>'
-
         throttle = controller.update(speed)
 
-        global recovery     # hack to avoid vehicle standstill in simulation
+        # hack to avoid vehicle standstill in simulation
+        global recovery
 
         if speed <= 0.01 and recovery > 0:
             recovery = max(0, recovery - 1)
-            info_text += '<<< RECOVERY MODE >>>'
+            info_text += '\033[92m<<< RECOVERY MODE >>>\033[00m'
             send_control(0, -1.)
         else:    
             send_control(steering_angle, throttle)
@@ -133,9 +138,16 @@ def telemetry(sid, data):
 
         # save frame
         if args.image_folder != '':
+            global frame
+
             timestamp = datetime.utcnow().strftime('%Y_%m_%d_%H_%M_%S_%f')[:-3]
             image_filename = os.path.join(args.image_folder, timestamp)
-            image = Image.fromarray(DataAugmentation.draw_steering_angles(image_array, steering_angle=steering_angle))
+            image = Image.fromarray(DataAugmentation.draw_overlay(image_array,
+                                                    frame=frame,
+                                                    steering_angle=steering_angle * 25.,
+                                                    speed=float(speed),
+                                                    color=(0, 30, 70)))
+            frame += 1
             image.save('{}.jpg'.format(image_filename))
 
             # TODO: show steering angle prediction in image
