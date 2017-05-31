@@ -39,7 +39,6 @@ The following list gives a short overview about all relevant files and its purpo
 * `model.py` containing the script to create and train the model
 * `drive.py` for driving the car in autonomous mode
 * `model.h5` containing a trained convolution neural network
-* `writeup_report.md` summarizing the results
 * `toolbox.py` containing basic scripts to prepare the datasets (e.g. merging CSV files, reduced 0° steering angles, plot steering angle histograms, plot odometry signals over time, etc.)
 * `DataAugmentation.py` containing functions to augment the dataset (e.g. image flipping, translation, brightness, shadows, etc.)
 * `BaseNetwork.py` for basic network function like initialization, training and model storage
@@ -47,6 +46,9 @@ The following list gives a short overview about all relevant files and its purpo
   * `NvidiaFull.py` containing a fully implemented NVIDIA model
   * `NvidiaLight.py` containing a lightweight NVIDIA model (reduced number of convolutional and fully connected layers)
   * `VGG.py` containing a basic VGG-16 model
+* `writeup.md` summarizing the results
+* `video_track_1.mp4` autonomous driving behavior on track 1
+* `video_track_2.mp4` autonomous driving behavior on track 2 (jungle track)
 
 ## 3. Model Architecture and Training Strategy
 
