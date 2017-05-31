@@ -38,19 +38,19 @@ The challenge of this project is not only developing a CNN model which is capabl
 ## 2. Relevant Files
 
 The following list gives a short overview about all relevant files and its purpose.
-* `model.py` containing the script to create and train the model
-* `drive.py` for driving the car in autonomous mode
-* `model.h5` containing a trained convolution neural network
-* `toolbox.py` containing basic scripts to prepare the datasets (e.g. merging CSV files, reduced 0° steering angles, plot steering angle histograms, plot odometry signals over time, etc.)
-* `DataAugmentation.py` containing functions to augment the dataset (e.g. image flipping, translation, brightness, shadows, etc.)
-* `BaseNetwork.py` for basic network function like initialization, training and model storage
-  * `LenNet.py` containing the standard LeNet-5 model
-  * `NvidiaFull.py` containing a fully implemented NVIDIA model
-  * `NvidiaLight.py` containing a lightweight NVIDIA model (reduced number of convolutional and fully connected layers)
-  * `VGG.py` containing a basic VGG-16 model
-* `writeup.md` summarizing the results
-* `video_track_1.mp4` autonomous driving behavior on track 1
-* `video_track_2.mp4` autonomous driving behavior on track 2 (jungle track)
+* [model.py](model.py) containing the script to create and train the model
+* [drive.py](drive.py) for driving the car in autonomous mode
+* [model.h5](model.h5) containing a trained convolution neural network
+* [toolbox.py](toolbox.py) containing basic scripts to prepare the datasets (e.g. merging CSV files, reduced 0° steering angles, plot steering angle histograms, plot odometry signals over time, etc.)
+* [DataAugmentation.py](DataAugmentation.py) containing functions to augment the dataset (e.g. image flipping, translation, brightness, shadows, etc.)
+* [BaseNetwork.py](networks/BaseNetwork.py) for basic network function like initialization, training and model storage
+  * [LeNet.py](networks/LeNet.py) containing the standard LeNet-5 model
+  * [NvidiaFull.py](networks/NvidiaFull.py) containing a fully implemented NVIDIA model
+  * [NvidiaLight.py](networks/NvidiaLight.py) containing a lightweight NVIDIA model (reduced number of convolutional and fully connected layers)
+  * [VGG.py](networks/VGG.py) containing a basic VGG-16 model
+* [writeup.md](writeup.md) summarizing the results
+* [video_track_1.mp4](video_track_1.mp4) autonomous driving behavior on track 1
+* [video_track_2.mp4](video_track_2.mp4) autonomous driving behavior on track 2 (jungle track)
 
 ## 3. Model Architecture and Training Strategy
 
@@ -93,7 +93,7 @@ All networks have been trained on an Amazon Web Services (AWS) EC2 g2.2xlarge in
 - 15 GB RAM
 - 60 GB SSD
 
-After each epoch I stored the trained model because the validation loss is not a good indicator about how well the model drives in the simulator. It happened that a worse validation loss drives more stable and smoother than a lower one. Furthermore, the training has been stopped as soon as the validation loss hasn't been change for 3 consecutive epochs (for details see `train()` method in `BaseNetwork.py`).
+After each epoch I stored the trained model because the validation loss is not a good indicator about how well the model drives in the simulator. It happened that a worse validation loss drives more stable and smoother than a lower one. Furthermore, the training has been stopped as soon as the validation loss hasn't been change for 3 consecutive epochs (for details see `train()` method in [BaseNetwork.py](networks/BaseNetwork.py)).
 
 ```python
 checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=False, mode='min')
@@ -112,7 +112,7 @@ The LeNet-5 model worked well in easy scenarios as they can be found on track 1 
 
 ### 3.4 Final Model Architecture
 
-The final model architecture (`NvidiaFull.py`) consists of a convolution neural network with the following layers and layer sizes. The RGB input images are cropped and resized to 64x64 pixels outside the model.
+The final model architecture ([NvidiaFull.py](networks/NvidiaFull.py)) consists of a convolution neural network with the following layers and layer sizes. The RGB input images are cropped and resized to 64x64 pixels outside the model.
 
 The first layer normalizes the image to a range between -0.5 and +0.5 by use of a Keras lambda layer. To introduce nonlinearity I chose for all convolutional and fully connected layers a RELU activation. To avoid overfitting the model contains 3 dropout layers with a drop rate of 50% in the fully connected layers.
 
@@ -203,7 +203,7 @@ In order to recover from situations when the car accidentally drives too close t
 
 ### 4.4 Dataset Augmentation
 
-To increase the variety in the dataset in terms of road geometry (curve radius and slope), cast shadows, brightness and vehicle positions, I applied a couple of image augmentation methods. The images are randomly augmented in the `generator()` method in the `BaseNetwork.py` file.
+To increase the variety in the dataset in terms of road geometry (curve radius and slope), cast shadows, brightness and vehicle positions, I applied a couple of image augmentation methods. The images are randomly augmented in the `generator()` method in the [BaseNetwork.py](networks/BaseNetwork.py) file.
 
 The images below summarize the augmentation methods which basically change the color of the image. From left to right the original, the equalized histogram, the randomly applied brightness, the blur effect and the cast shadow effects are depicted.
 
@@ -303,6 +303,7 @@ The final dataset consists of 37.348 well balanced samples which I split up into
 
 The NVIDA model trained with the dataset as described above showed the best performance on track 1 and 2.
 
+You-Tube Links:
 [Track 1](https://youtu.be/7tbjENQHzhQ)
 [Track 2](https://youtu.be/6Kw91WoTJvA)
 
