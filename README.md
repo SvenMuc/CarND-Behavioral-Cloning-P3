@@ -70,13 +70,13 @@ The model uses an adam optimizer with max learning rate of 0.0001. The default l
 
 To find the best activation function, I tested all applied models with different activations like RELU, ELU, tanh. The ELU activation tend to extremely nervous steering angle predictions so that the car starts to bounce between the left and right lane boundary. The tanh activation often underestimated the steering angle. Best prediction results have been achieved with the RELU activation.
 
-In addition, I tested different image input sizes and color spaces. I cropped the image to the ROI=[20, 60, 300, 138] in order to remove the hood and the landscape (e.g. trees, sky, etc.) which do not provide any beneficial input to the model. The crop on the left/right side has been introduced to reduce the influence of the replicated image areas induced by the image augmentation (see chapter [Dataset Augmentation](#4.4-dataset-augmentation) below for further details). Finally, I resized the image to 64x64 pixels to speed up the training process. Several test runs with different image sizes showed that the size have almost no influence on the prediction performance (at least in tested range and samples).
+In addition, I tested different image input sizes and color spaces. I cropped the image to the ROI=[20, 60, 300, 138] in order to remove the hood and the landscape (e.g. trees, sky, etc.) which do not provide any beneficial input to the model. The crop on the left/right side has been introduced to reduce the influence of the replicated image areas induced by the image augmentation (see chapter [Dataset Augmentation](#44-dataset-augmentation) below for further details). Finally, I resized the image to 64x64 pixels to speed up the training process. Several test runs with different image sizes showed that the size have almost no influence on the prediction performance (at least in tested range and samples).
 
 ![alt text][image_roi]
 
 ### 3.4 Training Strategy
 
-In order to generalize the model and to drive smoothly in the center of the lane on track 1 and in the center of the right lane on track 2, I heavily augmented the dataset by usage of left and right camera images, random translations, random shadow augmentations, random brightness changes, etc. All applied augmentations methods are explained in detail in chapter [Creation of the Training Set & Training Process](#4.-creation-of-the-training-set-&-training-process).
+In order to generalize the model and to drive smoothly in the center of the lane on track 1 and in the center of the right lane on track 2, I heavily augmented the dataset by usage of left and right camera images, random translations, random shadow augmentations, random brightness changes, etc. All applied augmentations methods are explained in detail in chapter [Creation of the Training Set & Training Process](#4-creation-of-the-training-set--training-process).
 
 Every time I identified a section the car left the lane (e.g. sharp turns, bridge area, shadow sections, slopes, ...) I either tried to optimize the augmentation algorithms or collected additional recordings of these sections by the following rules.
 
@@ -303,7 +303,8 @@ The final dataset consists of 37.348 well balanced samples which I split up into
 
 The NVIDA model trained with the dataset as described above showed the best performance on track 1 and 2.
 
-ADD you tube links here...
+[Track 1](https://youtu.be/7tbjENQHzhQ)
+[Track 2](https://youtu.be/6Kw91WoTJvA)
 
 The diagram below depicts the trained and predicted steering angles of one round on track 1. The prediction is very close to the ground truth data but shows more jitter.
 
