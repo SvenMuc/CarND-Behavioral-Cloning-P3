@@ -303,9 +303,10 @@ The final dataset consists of 37.348 well balanced samples which I split up into
 
 The NVIDA model trained with the dataset as described above showed the best performance on track 1 and 2.
 
-You-Tube Links:
-[Track 1](https://youtu.be/7tbjENQHzhQ)
-[Track 2](https://youtu.be/6Kw91WoTJvA)
+You-Tube Links of track 1 and 2 results:
+
+[![Track 1](https://img.youtube.com/vi/7tbjENQHzhQ/0.jpg)](https://www.youtube.com/watch?v=7tbjENQHzhQ)
+[![Track 1](https://img.youtube.com/vi/6Kw91WoTJvA/0.jpg)](https://www.youtube.com/watch?v=6Kw91WoTJvA)
 
 The diagram below depicts the trained and predicted steering angles of one round on track 1. The prediction is very close to the ground truth data but shows more jitter.
 
