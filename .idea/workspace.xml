@@ -22,11 +22,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="model.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="model.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="35">
-              <caret line="320" column="24" lean-forward="true" selection-start-line="320" selection-start-column="24" selection-end-line="320" selection-end-column="24" />
+            <state relative-caret-position="5160">
+              <caret line="344" column="20" lean-forward="true" selection-start-line="344" selection-start-column="20" selection-end-line="344" selection-end-column="20" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -37,8 +37,8 @@
       <file leaf-file-name="drive.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/drive.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="517">
-              <caret line="139" column="0" lean-forward="false" selection-start-line="139" selection-start-column="0" selection-end-line="139" selection-end-column="0" />
+            <state relative-caret-position="93">
+              <caret line="53" column="13" lean-forward="false" selection-start-line="53" selection-start-column="13" selection-end-line="53" selection-end-column="13" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -49,8 +49,8 @@
       <file leaf-file-name="toolbox.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/toolbox.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="10635">
-              <caret line="727" column="0" lean-forward="false" selection-start-line="727" selection-start-column="0" selection-end-line="727" selection-end-column="0" />
+            <state relative-caret-position="375">
+              <caret line="334" column="87" lean-forward="true" selection-start-line="333" selection-start-column="8" selection-end-line="334" selection-end-column="87" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -61,10 +61,22 @@
       <file leaf-file-name="DataAugmentation.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DataAugmentation.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4635">
-              <caret line="314" column="38" lean-forward="false" selection-start-line="314" selection-start-column="38" selection-end-line="314" selection-end-column="38" />
+            <state relative-caret-position="259">
+              <caret line="411" column="0" lean-forward="false" selection-start-line="411" selection-start-column="0" selection-end-line="411" selection-end-column="0" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="test_augmentation.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/test_augmentation.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="165">
+              <caret line="11" column="0" lean-forward="false" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#30#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -73,8 +85,8 @@
       <file leaf-file-name="BaseNetwork.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/networks/BaseNetwork.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3735">
-              <caret line="255" column="0" lean-forward="false" selection-start-line="255" selection-start-column="0" selection-end-line="255" selection-end-column="0" />
+            <state relative-caret-position="105">
+              <caret line="7" column="51" lean-forward="false" selection-start-line="7" selection-start-column="51" selection-end-line="7" selection-end-column="51" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -85,8 +97,8 @@
       <file leaf-file-name="NvidiaFull.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/networks/NvidiaFull.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="945">
-              <caret line="70" column="49" lean-forward="false" selection-start-line="70" selection-start-column="45" selection-end-line="70" selection-end-column="49" />
+            <state relative-caret-position="-89">
+              <caret line="48" column="33" lean-forward="true" selection-start-line="48" selection-start-column="33" selection-end-line="48" selection-end-column="33" />
               <folding>
                 <element signature="e#0#44#0" expanded="true" />
               </folding>
@@ -98,7 +110,7 @@
         <entry file="file://$PROJECT_DIR$/ec2_instance_get_trained_model.sh">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="105">
-              <caret line="7" column="20" lean-forward="false" selection-start-line="7" selection-start-column="20" selection-end-line="7" selection-end-column="20" />
+              <caret line="7" column="21" lean-forward="false" selection-start-line="7" selection-start-column="21" selection-end-line="7" selection-end-column="21" />
               <folding />
             </state>
           </provider>
@@ -108,7 +120,7 @@
         <entry file="file://$PROJECT_DIR$/ec2_instance_update_model.sh">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="105">
-              <caret line="7" column="20" lean-forward="false" selection-start-line="7" selection-start-column="20" selection-end-line="7" selection-end-column="20" />
+              <caret line="7" column="21" lean-forward="false" selection-start-line="7" selection-start-column="21" selection-end-line="7" selection-end-column="21" />
               <folding />
             </state>
           </provider>
@@ -125,11 +137,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>angle_threshold</find>
-      <find>prepare</find>
-      <find>CROP_IMAGE_TOP</find>
-      <find>skip_rate_zero_angles</find>
-      <find>get_number_generator_samples</find>
       <find>balance</find>
       <find>NB_EPOCHS</find>
       <find>skip</find>
@@ -151,9 +158,14 @@
       <find>dir</find>
       <find>split</find>
       <find>color_scheme</find>
-      <find>relu</find>
       <find>elu</find>
       <find>random</find>
+      <find>relu</find>
+      <find>i</find>
+      <find>imsho</find>
+      <find>cv2</find>
+      <find>slow_down_angle_threshold_1</find>
+      <find>slow_down_angle_threshold</find>
       <find>recovery</find>
     </findStrings>
     <replaceStrings>
@@ -178,8 +190,8 @@
       <replace>self.color_model</replace>
       <replace>image_c</replace>
       <replace>image_center</replace>
-      <replace>elu</replace>
       <replace>relu</replace>
+      <replace>elu</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -223,15 +235,16 @@
         <option value="$PROJECT_DIR$/TelemetryPlots.py" />
         <option value="$PROJECT_DIR$/test_sort_array.py" />
         <option value="$PROJECT_DIR$/networks/NvidiaLight.py" />
-        <option value="$PROJECT_DIR$/networks/NvidiaFull.py" />
+        <option value="$PROJECT_DIR$/model.py" />
         <option value="$PROJECT_DIR$/ec2_instance_get_trained_model.sh" />
         <option value="$PROJECT_DIR$/ec2_instance_update_model.sh" />
-        <option value="$PROJECT_DIR$/DataAugmentation.py" />
+        <option value="$PROJECT_DIR$/networks/NvidiaFull.py" />
         <option value="$PROJECT_DIR$/toolbox.py" />
-        <option value="$PROJECT_DIR$/networks/BaseNetwork.py" />
-        <option value="$PROJECT_DIR$/networks/BaseNetwork.py" />
         <option value="$PROJECT_DIR$/drive.py" />
-        <option value="$PROJECT_DIR$/model.py" />
+        <option value="$PROJECT_DIR$/DataAugmentation.py" />
+        <option value="$PROJECT_DIR$/networks/BaseNetwork.py" />
+        <option value="$PROJECT_DIR$/networks/BaseNetwork.py" />
+        <option value="$PROJECT_DIR$/test_augmentation.py" />
       </list>
     </option>
   </component>
@@ -291,6 +304,8 @@
     </navigator>
     <panes>
       <pane id="PackagesPane" />
+      <pane id="Scratches" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -319,8 +334,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -347,7 +360,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.DataAugmentation">
+  <component name="RunManager" selected="Python.test_augmentation">
     <configuration default="false" name="DataAugmentation" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -384,24 +397,6 @@
       <option name="EMULATE_TERMINAL" value="false" />
       <method />
     </configuration>
-    <configuration default="false" name="DynamicPlot" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/networks" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="CarND-Behavioral-Cloning-P3" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/networks/DynamicPlot.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <method />
-    </configuration>
     <configuration default="false" name="test_sort_array" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -434,6 +429,24 @@
       <module name="CarND-Behavioral-Cloning-P3" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/toolbox.py" />
       <option name="PARAMETERS" value="-b data/track_1_forwards.csv data/balanced.csv 50 0.25" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="test_augmentation" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="CarND-Behavioral-Cloning-P3" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test_augmentation.py" />
+      <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <method />
@@ -671,17 +684,17 @@
     <list size="5">
       <item index="0" class="java.lang.String" itemvalue="Python.DataAugmentation" />
       <item index="1" class="java.lang.String" itemvalue="Python.drive" />
-      <item index="2" class="java.lang.String" itemvalue="Python.DynamicPlot" />
-      <item index="3" class="java.lang.String" itemvalue="Python.test_sort_array" />
-      <item index="4" class="java.lang.String" itemvalue="Python.toolbox" />
+      <item index="2" class="java.lang.String" itemvalue="Python.test_sort_array" />
+      <item index="3" class="java.lang.String" itemvalue="Python.toolbox" />
+      <item index="4" class="java.lang.String" itemvalue="Python.test_augmentation" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.DataAugmentation" />
-        <item index="1" class="java.lang.String" itemvalue="Python.toolbox" />
-        <item index="2" class="java.lang.String" itemvalue="Python.test_sort_array" />
-        <item index="3" class="java.lang.String" itemvalue="Python.drive" />
-        <item index="4" class="java.lang.String" itemvalue="Python.DynamicPlot" />
+        <item index="0" class="java.lang.String" itemvalue="Python.test_augmentation" />
+        <item index="1" class="java.lang.String" itemvalue="Python.DataAugmentation" />
+        <item index="2" class="java.lang.String" itemvalue="Python.toolbox" />
+        <item index="3" class="java.lang.String" itemvalue="Python.test_sort_array" />
+        <item index="4" class="java.lang.String" itemvalue="Python.drive" />
       </list>
     </recent_temporary>
     <configuration name="&lt;template&gt;" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" default="true" selected="false">
@@ -783,10 +796,52 @@
       <option name="project" value="LOCAL" />
       <updated>1495570651826</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Removed np.random.seed()">
+      <created>1495957597152</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1495957597152</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Improved shadow augmentation and euqalize histogram.&#10;Introduced draw_overlay method used by video generation.">
+      <created>1495966650555</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1495966650555</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Optimized generator and fixed ModelCheckpoint method.">
+      <created>1495966716100</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1495966716100</updated>
+    </task>
+    <task id="LOCAL-00016" summary="Added min/max values to the title of the normed histogram.">
+      <created>1496085001924</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1496085001924</updated>
+    </task>
+    <task id="LOCAL-00017" summary="Fix shadow augmentation orientations.">
+      <created>1496096472953</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1496096472953</updated>
+    </task>
+    <task id="LOCAL-00018" summary="Optimized speed control and added colored console output.">
+      <created>1496096555644</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1496096555644</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
-  <component name="TodoView">
+  <component name="TodoView" selected-index="2">
     <todo-panel id="selected-file">
       <is-autoscroll-to-source value="true" />
     </todo-panel>
@@ -796,25 +851,23 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1680" height="986" extended-state="6" />
-    <editor active="true" />
+    <frame x="0" y="23" width="1680" height="986" extended-state="0" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32997763" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32997763" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32997763" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32967034" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3557047" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32885906" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32997763" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32997763" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22649573" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32997763" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2032967" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25213677" sideWeight="0.49552572" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39932886" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24969475" sideWeight="0.5044743" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39932886" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32967034" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -824,6 +877,7 @@
       <window_info id="Inspection Results" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32997763" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32997763" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32997763" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -842,6 +896,8 @@
         <entry key="MAIN">
           <value>
             <State>
+              <option name="LONG_EDGES_VISIBLE" value="true" />
+              <option name="BEK_SORT_TYPE" value="1" />
               <option name="RECENTLY_FILTERED_USER_GROUPS">
                 <collection />
               </option>
@@ -876,7 +932,13 @@
     <MESSAGE value="Added equalize steering angle histogram function.&#10;Added left/right bias functionality in flip image function.&#10;Optimized random data augmentation functions." />
     <MESSAGE value="Optimized data augmentation and implemented save model graph (needs the graphviz package!)." />
     <MESSAGE value="Workspace updated." />
-    <option name="LAST_COMMIT_MESSAGE" value="Workspace updated." />
+    <MESSAGE value="Removed np.random.seed()" />
+    <MESSAGE value="Improved shadow augmentation and euqalize histogram.&#10;Introduced draw_overlay method used by video generation." />
+    <MESSAGE value="Optimized generator and fixed ModelCheckpoint method." />
+    <MESSAGE value="Added min/max values to the title of the normed histogram." />
+    <MESSAGE value="Fix shadow augmentation orientations." />
+    <MESSAGE value="Optimized speed control and added colored console output." />
+    <option name="LAST_COMMIT_MESSAGE" value="Optimized speed control and added colored console output." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -897,7 +959,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="152" />
+      <option name="time" value="153" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -906,24 +968,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/summarize_training_results.py" />
-    <entry file="file://$PROJECT_DIR$/writeup_template.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="418">
-            <caret line="96" column="0" lean-forward="true" selection-start-line="96" selection-start-column="0" selection-end-line="96" selection-end-column="0" />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/miniconda3/envs/carnd-term1/lib/python3.5/site-packages/matplotlib/mlab.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="191">
-          <caret line="1544" column="0" lean-forward="false" selection-start-line="1544" selection-start-column="0" selection-end-line="1544" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/miniconda3/envs/carnd-term1/lib/python3.5/site-packages/numpy/lib/twodim_base.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="206">
@@ -983,13 +1027,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="482">
           <caret line="308" column="0" lean-forward="false" selection-start-line="308" selection-start-column="0" selection-end-line="308" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Library/Caches/IdeaIC2017.1/python_stubs/1996605911/numpy/random/mtrand.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-746">
-          <caret line="2756" column="4" lean-forward="false" selection-start-line="2756" selection-start-column="4" selection-end-line="2756" selection-end-column="4" />
         </state>
       </provider>
     </entry>
@@ -1151,46 +1188,67 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ec2_instance_update_model.sh">
+    <entry file="file://$USER_HOME$/Library/Caches/IdeaIC2017.1/python_stubs/1996605911/numpy/random/mtrand.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="7" column="20" lean-forward="false" selection-start-line="7" selection-start-column="20" selection-end-line="7" selection-end-column="20" />
-          <folding />
+        <state relative-caret-position="-27">
+          <caret line="2304" column="4" lean-forward="false" selection-start-line="2304" selection-start-column="4" selection-end-line="2304" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/simulator/mac_sim.app/Contents/Data/Managed/etc/mono/1.0/DefaultWsdlHelpGenerator.aspx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="191">
+          <caret line="1178" column="37" lean-forward="false" selection-start-line="1178" selection-start-column="37" selection-end-line="1178" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/simulator/mac_sim.app/Contents/Data/Managed/etc/mono/2.0/DefaultWsdlHelpGenerator.aspx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="1167" column="37" lean-forward="false" selection-start-line="1167" selection-start-column="37" selection-end-line="1167" selection-end-column="37" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ec2_instance_get_trained_model.sh">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
-          <caret line="7" column="20" lean-forward="false" selection-start-line="7" selection-start-column="20" selection-end-line="7" selection-end-column="20" />
+          <caret line="7" column="21" lean-forward="false" selection-start-line="7" selection-start-column="21" selection-end-line="7" selection-end-column="21" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ec2_instance_update_model.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" column="21" lean-forward="false" selection-start-line="7" selection-start-column="21" selection-end-line="7" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/drive.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="93">
+          <caret line="53" column="13" lean-forward="false" selection-start-line="53" selection-start-column="13" selection-end-line="53" selection-end-column="13" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/networks/NvidiaFull.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="945">
-          <caret line="70" column="49" lean-forward="false" selection-start-line="70" selection-start-column="45" selection-end-line="70" selection-end-column="49" />
+        <state relative-caret-position="-89">
+          <caret line="48" column="33" lean-forward="true" selection-start-line="48" selection-start-column="33" selection-end-line="48" selection-end-column="33" />
           <folding>
             <element signature="e#0#44#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DataAugmentation.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4635">
-          <caret line="314" column="38" lean-forward="false" selection-start-line="314" selection-start-column="38" selection-end-line="314" selection-end-column="38" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/networks/BaseNetwork.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3735">
-          <caret line="255" column="0" lean-forward="false" selection-start-line="255" selection-start-column="0" selection-end-line="255" selection-end-column="0" />
+        <state relative-caret-position="105">
+          <caret line="7" column="51" lean-forward="false" selection-start-line="7" selection-start-column="51" selection-end-line="7" selection-end-column="51" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
           </folding>
@@ -1199,18 +1257,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/toolbox.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="10635">
-          <caret line="727" column="0" lean-forward="false" selection-start-line="727" selection-start-column="0" selection-end-line="727" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/drive.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="517">
-          <caret line="139" column="0" lean-forward="false" selection-start-line="139" selection-start-column="0" selection-end-line="139" selection-end-column="0" />
+        <state relative-caret-position="375">
+          <caret line="334" column="87" lean-forward="true" selection-start-line="333" selection-start-column="8" selection-end-line="334" selection-end-column="87" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
           </folding>
@@ -1219,10 +1267,30 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="35">
-          <caret line="320" column="24" lean-forward="true" selection-start-line="320" selection-start-column="24" selection-end-line="320" selection-end-column="24" />
+        <state relative-caret-position="5160">
+          <caret line="344" column="20" lean-forward="true" selection-start-line="344" selection-start-column="20" selection-end-line="344" selection-end-column="20" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataAugmentation.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="259">
+          <caret line="411" column="0" lean-forward="false" selection-start-line="411" selection-start-column="0" selection-end-line="411" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test_augmentation.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="11" column="0" lean-forward="false" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
           </folding>
         </state>
       </provider>
